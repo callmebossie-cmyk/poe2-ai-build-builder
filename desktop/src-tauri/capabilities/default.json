@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Base desktop window capability without filesystem, shell, or secret access.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

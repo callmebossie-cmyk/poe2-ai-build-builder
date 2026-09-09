@@ -4,11 +4,11 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 
 ## Current phase
 
-Checkpoints 1 through 5 are complete. The Core MVP can retrieve candidates, generate live directions and a Full Build, and validate the supported structural/rule boundary.
+Checkpoints 1 through 5 and Checkpoint 6A are complete. The Core MVP now has a runnable provider-neutral desktop foundation.
 
 ## Current checkpoint
 
-Checkpoint 5 — Full Build and Validator (complete); Checkpoint 6A — provider-neutral desktop foundation (next)
+Checkpoint 6A — provider-neutral desktop foundation (complete); Checkpoint 6B — deterministic core bridge (next)
 
 ## Completed work
 
@@ -42,10 +42,14 @@ Checkpoint 5 — Full Build and Validator (complete); Checkpoint 6A — provider
 - Revalidated the preserved live Full Build against the Checkpoint 5C and 5D rules without an AI revision.
 - Added an explicit advisory boundary for qualitative/resource fields and rejected unsupported numeric DPS, percentage, and price/currency claims.
 - Revalidated the preserved live Full Build against the final Checkpoint 5 contract and marked the Core MVP complete.
+- Added a React/TypeScript/Vite/Tauri desktop shell with first-run choices for no AI, Ollama, and cloud configuration.
+- Added versioned non-secret provider state, safe invalid-state fallback, quality modes, and a no-AI local-core dashboard.
+- Added a minimal Tauri capability boundary with no filesystem, shell, or credential permission and generated the application icon set.
 
 ## Tests
 
 - Passing: forty-two unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
+- Passing: five provider-configuration tests, strict TypeScript/Vite production build, Rust `cargo check`, and Tauri release compilation without bundling.
 - Passing: all 15 data validation queries, SQLite integrity check, and foreign-key check.
 - Passing: class mapping, real projectile route, point cost, virtual-root exclusion, wrong-ascendancy rejection, enabled-ascendancy route, and missing-node rejection.
 - Passing: retrieval bounds, provenance/reasons, expected Snipe mechanics/supports, unique-data honesty, deterministic output, word-boundary matching, and unknown-skill rejection.
@@ -88,4 +92,4 @@ None for the next bounded implementation phase.
 
 ## Next task
 
-Define the provider-neutral first-run configuration contract and the smallest desktop application shell while keeping deterministic features available without AI.
+Expose a narrow read-only deterministic-core command through Tauri and render its real result without adding AI calls or the complete build workflow.

@@ -30,6 +30,16 @@ $env:PYTHONPATH = 'src'
 python -m unittest discover -s tests -v
 ```
 
+Desktop foundation commands:
+
+```powershell
+Set-Location desktop
+npm install
+npm test
+npm run build
+npm run tauri build -- --no-bundle
+```
+
 Read these files before continuing:
 
 - `poe2_ai_build_builder_plan.md` — complete product and implementation plan
@@ -38,6 +48,7 @@ Read these files before continuing:
 - `TODO.md` — current task list
 - `USER_ACTION_REQUIRED.md` — user-only actions and blockers
 - `docs/DATA_SOURCES.md` — pinned provenance and distribution boundary
+- `docs/DESKTOP_FOUNDATION.md` — provider-neutral first-run and desktop security boundary
 
 ## Working rule
 

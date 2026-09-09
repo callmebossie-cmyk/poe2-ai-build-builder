@@ -1,0 +1,16 @@
+[package]
+name = "poe2-build-architect"
+version = "0.1.0"
+description = "Provider-neutral PoE2 build planning desktop application"
+authors = ["PoE2 AI Build Builder contributors"]
+edition = "2021"
+
+[lib]
+name = "poe2_build_architect_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.6.3", features = [] }
+
+[dependencies]
+tauri = { version = "2.11.5", features = [] }

@@ -53,11 +53,11 @@
 - [x] Checkpoint 2 — Passive Graph
 - [x] Checkpoint 3 — Candidate Retrieval
 - [x] Checkpoint 4 — AI Build Directions
-- [ ] Checkpoint 5 — Full Build and Validator
+- [x] Checkpoint 5 — Full Build and Validator
 - [ ] Checkpoint 6 — Desktop Application
 - [ ] Checkpoint 7 — Windows Distribution
 
-## In progress — Checkpoint 5: Full Build and Validator
+## Completed — Checkpoint 5: Full Build and Validator
 
 - [x] Select one validated live direction for the first bounded slice.
 - [x] Define the full-build request and response contract.
@@ -76,6 +76,8 @@
 
 ## Next — Checkpoint 6: Desktop Application
 
-- [ ] Checkpoint 6A — define provider-neutral first-run configuration and desktop shell boundary.
-- [ ] Keep deterministic features usable when no AI provider is configured.
-- [ ] Add provider configuration without hard-coding Ollama or any cloud model.
+- [x] Checkpoint 6A — define provider-neutral first-run configuration and desktop shell boundary.
+- [x] Keep the desktop foundation accessible when no AI provider is configured.
+- [x] Add versioned non-secret provider configuration without hard-coding a required provider.
+- [x] Compile a runnable Tauri executable without creating an installer.
+- [ ] Checkpoint 6B — connect the deterministic Python core to the desktop boundary.

@@ -46,15 +46,18 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 - Narrative fields are explicitly advisory, resource/DPS/price calculation is labeled unavailable, and unsupported quantitative narrative claims are rejected.
 - The preserved live Full Build passes the final Checkpoint 5 validator without revision.
 - Forty-two tests pass on Python 3.10 with resource warnings treated as errors; the pre-Ollama suite also passed on Python 3.14.
+- Checkpoint 6A adds a runnable React 19, TypeScript 7, Vite 8, and Tauri 2 desktop shell with provider-neutral first-run configuration.
+- Users can continue with no AI, choose local Ollama, or prepare a cloud endpoint/model; ordinary configuration stores no credential.
+- Five provider-state tests, the frontend production build, Rust `cargo check`, and native release compilation pass.
 
 ## Current phase
 
-Checkpoint 5 — Full Build and Validator is complete. Checkpoint 6A — provider-neutral desktop foundation is next.
+Checkpoint 6A — provider-neutral desktop foundation is complete. Checkpoint 6B — deterministic core bridge is next.
 
 ## Next exact action
 
-Define the provider-neutral first-run configuration contract and the smallest desktop application shell while keeping deterministic features available without AI.
+Expose a narrow read-only deterministic-core command through Tauri and render its real result in the desktop shell without adding the complete build workflow.
 
 ## Completion rule for the next phase
 
-Do not build the full UX at once. Complete and validate the provider/settings foundation before adding the build workflow screens.
+Keep the bridge read-only and narrow. Do not add AI calls, credential storage, or the complete build workflow in the same phase.
