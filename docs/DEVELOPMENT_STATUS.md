@@ -4,11 +4,11 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 
 ## Current phase
 
-Checkpoints 1 through 4 are complete.
+Checkpoints 1 through 4 and Checkpoint 5A are complete. Checkpoint 5B remains open.
 
 ## Current checkpoint
 
-Checkpoint 4 — AI Build Directions (complete)
+Checkpoint 5A — bounded Full Build contract and deterministic validator (complete); Checkpoint 5B — live full-build run (next)
 
 ## Completed work
 
@@ -32,10 +32,13 @@ Checkpoint 4 — AI Build Directions (complete)
 - Added a local Ollama adapter with JSON-schema constrained output, runtime metadata, and bounded validation retries.
 - Ran `qwen3:8b` against the bounded Snipe context and validated three materially distinct live directions on the first attempt.
 - Preserved the live result at ignored local path `.cache/live-directions.json`; no credentials or generated recommendations are committed.
+- Selected the validated Ranger/Ranger1 Projectile Speed Boost direction for the first bounded full-build slice.
+- Added a provider-neutral full-build contract, graph-derived passive allocation, deterministic validator, and explicitly labeled offline fixture.
+- Added validation for selected entity IDs, passive connectivity, source support relationships, released Bow bases, positive mod spawn tags, item/mod levels, base attributes, and duplicate slots.
 
 ## Tests
 
-- Passing: twenty-nine unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
+- Passing: thirty-four unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
 - Passing: all 15 data validation queries, SQLite integrity check, and foreign-key check.
 - Passing: class mapping, real projectile route, point cost, virtual-root exclusion, wrong-ascendancy rejection, enabled-ascendancy route, and missing-node rejection.
 - Passing: retrieval bounds, provenance/reasons, expected Snipe mechanics/supports, unique-data honesty, deterministic output, word-boundary matching, and unknown-skill rejection.
@@ -78,4 +81,4 @@ None for the next bounded implementation phase.
 
 ## Next task
 
-Begin Checkpoint 5 with one bounded Full Build and Validator slice selected from a validated direction.
+Add a schema-constrained live Ollama full-build route and validate its output without weakening the deterministic checks.

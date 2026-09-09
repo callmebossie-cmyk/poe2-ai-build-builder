@@ -56,3 +56,15 @@
 - [ ] Checkpoint 5 — Full Build and Validator
 - [ ] Checkpoint 6 — Desktop Application
 - [ ] Checkpoint 7 — Windows Distribution
+
+## In progress — Checkpoint 5: Full Build and Validator
+
+- [x] Select one validated live direction for the first bounded slice.
+- [x] Define the full-build request and response contract.
+- [x] Build a connected passive allocation from the real graph.
+- [x] Validate selected entities, source-recommended supports, released bow bases, mod spawn tags, level requirements, and base attributes.
+- [x] Add an explicitly labeled offline full-build fixture and rejection tests.
+- [ ] Add the full-build schema to the live Ollama adapter.
+- [ ] Run a live full-build generation and validator revision loop.
+- [ ] Extend validation for remaining basic conflicts required by Checkpoint 5.
+- [ ] Mark Checkpoint 5 complete only after the live full build passes.

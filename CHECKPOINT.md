@@ -35,15 +35,16 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 - The local Ollama adapter constrains structured output to candidate IDs and retries validator failures with bounded feedback.
 - A live `qwen3:8b` run returned three materially distinct, schema-valid directions with valid entity references on its first attempt.
 - Live evidence is preserved locally at `.cache/live-directions.json` and excluded from Git; the bounded request was 27,293 bytes.
-- Twenty-nine tests pass on Python 3.10 with resource warnings treated as errors; the pre-Ollama suite also passed on Python 3.14.
+- The first full-build slice expands the validated Ranger direction into an exact graph-connected allocation and checks supports, Bow base, affix spawn tags, levels, and base attributes against SQLite.
+- Thirty-four tests pass on Python 3.10 with resource warnings treated as errors; the pre-Ollama suite also passed on Python 3.14.
 
 ## Current phase
 
-Checkpoint 4 — AI Build Directions is complete.
+Checkpoint 5A — bounded Full Build contract and deterministic validator is complete. Checkpoint 5B — live full-build execution remains open.
 
 ## Next exact action
 
-Read this file, `docs/DEVELOPMENT_STATUS.md`, and the project plan. Begin Checkpoint 5 with one bounded Full Build and Validator slice, keeping AI output untrusted until deterministic validation passes.
+Add a schema-constrained live Ollama full-build route for the selected Ranger direction without weakening deterministic validation.
 
 ## Completion rule for the next phase
 
