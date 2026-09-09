@@ -1,0 +1,7 @@
+/.cache/
+/data/*.db
+/data/*.db-*
+__pycache__/
+*.py[cod]
+.pytest_cache/
+

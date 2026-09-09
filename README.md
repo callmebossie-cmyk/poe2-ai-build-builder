@@ -4,7 +4,26 @@ Desktop build-planning tool for Path of Exile 2. The application will combine re
 
 ## Current status
 
-Repository bootstrap is complete. Implementation has not started. The next bounded phase is Checkpoint 1: Real Data Import, beginning with the Snipe vertical slice.
+Checkpoint 1 implements a real-data Snipe import pipeline. It downloads pinned GGG/RePoE exports locally, verifies checksums, builds a normalized SQLite database, and validates the checkpoint acceptance criteria. Downloaded data and generated databases are ignored by Git.
+
+## Data proof of concept
+
+Python 3.10 or newer is required. No runtime package dependency is needed.
+
+```powershell
+$env:PYTHONPATH = 'src'
+python -m poe2_builder.cli fetch
+python -m poe2_builder.cli build
+python -m poe2_builder.cli validate
+python -m poe2_builder.cli snipe
+```
+
+Run the unit tests with:
+
+```powershell
+$env:PYTHONPATH = 'src'
+python -m unittest discover -s tests -v
+```
 
 Read these files before continuing:
 
@@ -13,8 +32,8 @@ Read these files before continuing:
 - `docs/DEVELOPMENT_STATUS.md` — detailed project state
 - `TODO.md` — current task list
 - `USER_ACTION_REQUIRED.md` — user-only actions and blockers
+- `docs/DATA_SOURCES.md` — pinned provenance and distribution boundary
 
 ## Working rule
 
 Work one checkpoint at a time. Use real sourced data, record provenance and versions, run the relevant tests, update the state documents, then commit and push.
-
