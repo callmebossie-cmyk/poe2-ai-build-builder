@@ -18,6 +18,7 @@ python -m poe2_builder.cli validate
 python -m poe2_builder.cli snipe
 python -m poe2_builder.cli graph-demo --class-name Ranger
 python -m poe2_builder.cli retrieve --skill Snipe --playstyle Fast --goal Mapping --budget Cheap
+python -m poe2_builder.cli directions-contract-demo
 ```
 
 Run the unit tests with:

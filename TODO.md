@@ -35,14 +35,18 @@
 
 ## Next — Checkpoint 4: AI Build Directions
 
-- [ ] Define a provider-neutral request/response contract and quality mode.
-- [ ] Serialize only the compact BuildContext across the provider boundary.
-- [ ] Require at least three schema-valid build directions.
-- [ ] Require concept, class, ascendancy, mechanics, damage, defense, mapping, bossing, budget, league-start, strengths, weaknesses, and dependencies.
-- [ ] Reject referenced skills, supports, passives, bases, mods, and uniques that do not exist in the candidate context/database.
-- [ ] Add an explicitly labeled offline deterministic provider for tests.
-- [ ] Add structured-output and invented-entity tests.
-- [ ] Update status documents and create a local checkpoint commit without pushing.
+- [x] Define a provider-neutral request/response contract and quality mode.
+- [x] Serialize only the compact BuildContext across the provider boundary.
+- [x] Require at least three schema-valid and materially distinct build directions.
+- [x] Require concept, class, ascendancy, mechanics, damage, defense, mapping, bossing, budget, league-start, strengths, weaknesses, and dependencies.
+- [x] Reject referenced skills, supports, passives, bases, mods, and uniques that do not exist in the candidate context.
+- [x] Add an explicitly labeled offline deterministic provider for tests.
+- [x] Add structured-output, duplicate-direction, and invented-entity tests.
+- [x] Complete Checkpoint 4A documentation and local commit without pushing.
+- [ ] User chooses live cloud provider/model and test budget, or local Ollama model/resource route.
+- [ ] Implement the selected live provider adapter without storing credentials.
+- [ ] Run and validate at least three live directions.
+- [ ] Complete Checkpoint 4B and mark Checkpoint 4 complete.
 
 ## Later checkpoints
 

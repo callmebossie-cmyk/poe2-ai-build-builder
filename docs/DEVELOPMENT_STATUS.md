@@ -4,11 +4,11 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 
 ## Current phase
 
-Checkpoints 1 through 3 are complete. Checkpoint 4 is next.
+Checkpoints 1 through 3 and Checkpoint 4A are complete. Checkpoint 4B awaits a live-provider choice.
 
 ## Current checkpoint
 
-Checkpoint 4 — AI Build Directions (pending)
+Checkpoint 4A — Provider contract and validation (complete); Checkpoint 4B — Live provider run (blocked)
 
 ## Completed work
 
@@ -25,13 +25,18 @@ Checkpoint 4 — AI Build Directions (pending)
 - Added explainable scores, real graph-distance costs, provenance, bounded result counts, and serialized-size diagnostics.
 - Imported all 449 unique source rows without collapsing repeated canonical IDs; unique effect gaps are explicit.
 - Documented retrieval rules and current assumptions in `docs/CANDIDATE_RETRIEVAL.md`.
+- Added a provider-neutral build-direction service with Economy, Balanced, Deep Analysis, and Maximum quality modes.
+- Added a strict JSON response contract and validation for required content, types, ratings, entity references, class/ascendancy consistency, and material distinction.
+- Added an offline deterministic contract provider that is explicitly labeled as test-only output.
+- Documented the provider boundary and remaining live-provider work in `docs/BUILD_DIRECTION_CONTRACT.md`.
 
 ## Tests
 
-- Passing: seventeen unit/integration tests on Python 3.10 and Python 3.14 with `ResourceWarning` promoted to an error.
+- Passing: twenty-five unit/integration tests on Python 3.10 and Python 3.14 with `ResourceWarning` promoted to an error.
 - Passing: all 15 data validation queries, SQLite integrity check, and foreign-key check.
 - Passing: class mapping, real projectile route, point cost, virtual-root exclusion, wrong-ascendancy rejection, enabled-ascendancy route, and missing-node rejection.
 - Passing: retrieval bounds, provenance/reasons, expected Snipe mechanics/supports, unique-data honesty, deterministic output, word-boundary matching, and unknown-skill rejection.
+- Passing: all quality modes, bounded provider request, three-direction schema, test-only labeling, malformed/incomplete response rejection, invented IDs, class mismatch, and duplicate-selection rejection.
 - Failing: none.
 
 ## Known issues
@@ -41,10 +46,11 @@ Checkpoint 4 — AI Build Directions (pending)
 - The graph currently optimizes point count only; weighted build value belongs to candidate retrieval and later planning.
 - Candidate scores are deterministic heuristics for context selection, not claims of final build strength or exact DPS.
 - Unique effect data is absent from the selected RePoE export and remains unscored until a permitted, versioned source is integrated.
+- No live AI provider has run. Offline contract examples are not build recommendations and do not complete Checkpoint 4.
 
 ## Current blockers
 
-None.
+Live-provider selection requires user direction because cloud execution can incur API cost and local Ollama requires a model download. See `USER_ACTION_REQUIRED.md`.
 
 ## Data versions
 
@@ -65,7 +71,8 @@ None.
 - Passive allocation treats source edges as undirected, excludes the virtual `root`, and opens only the explicitly selected ascendancy island.
 - Repository changes are accumulated locally and are pushed only when the user explicitly asks.
 - Candidate retrieval uses whole-word/phrase matches, source compatibility/release/spawn rules, passive point distance, and explicit bounded limits. The provider layer receives no raw database payloads.
+- Provider responses remain untrusted until schema and candidate-reference validation pass. Offline provider output is always labeled test-only.
 
 ## Next task
 
-Implement Checkpoint 4's provider-neutral structured build-direction contract, offline test provider, schema validation, and invented-entity rejection over the compact BuildContext.
+After the user selects a live provider/model and cost/resource route, implement its adapter and validate a live response through the existing Checkpoint 4A contract.

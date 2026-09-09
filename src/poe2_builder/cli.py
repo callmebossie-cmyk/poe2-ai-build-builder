@@ -6,6 +6,7 @@ from pathlib import Path
 
 from .fetch import fetch_sources
 from .database import connect
+from .directions import BuildDirectionService, OfflineDeterministicProvider, QualityMode
 from .graph import PassiveGraph, PathNotFoundError
 from .importer import build_database
 from .retrieval import BuildIntent, CandidateRetriever
@@ -29,6 +30,12 @@ def parser() -> argparse.ArgumentParser:
     retrieve.add_argument("--playstyle", default="Fast")
     retrieve.add_argument("--goal", default="Mapping")
     retrieve.add_argument("--budget", default="Cheap")
+    directions = commands.add_parser("directions-contract-demo", help="run the offline build-direction contract test")
+    directions.add_argument("--skill", default="Snipe")
+    directions.add_argument("--playstyle", default="Fast")
+    directions.add_argument("--goal", default="Mapping")
+    directions.add_argument("--budget", default="Cheap")
+    directions.add_argument("--quality", choices=[mode.value for mode in QualityMode], default=QualityMode.BALANCED.value)
     commands.add_parser("all", help="fetch, build, validate, and show Snipe data")
     return result
 
@@ -83,6 +90,10 @@ def main() -> None:
     if args.command == "retrieve":
         intent = BuildIntent(args.skill, args.playstyle, args.goal, args.budget)
         print_json(CandidateRetriever(args.database).retrieve(intent))
+    if args.command == "directions-contract-demo":
+        intent = BuildIntent(args.skill, args.playstyle, args.goal, args.budget)
+        service = BuildDirectionService(args.database, OfflineDeterministicProvider())
+        print_json(service.generate(intent, QualityMode(args.quality)))
 
 
 if __name__ == "__main__":
