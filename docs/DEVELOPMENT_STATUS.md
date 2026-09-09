@@ -4,11 +4,11 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 
 ## Current phase
 
-Checkpoints 1 through 4 and Checkpoints 5A through 5C are complete. Remaining Checkpoint 5 gem and character conflict validation is open.
+Checkpoints 1 through 4 and Checkpoints 5A through 5D are complete. Unsupported qualitative/resource claim handling remains before Checkpoint 5 can close.
 
 ## Current checkpoint
 
-Checkpoint 5C — bounded equipment/support conflict validation (complete); next bounded gem and character conflict rules remain open
+Checkpoint 5D — bounded gem-rule and character-base validation (complete); unsupported claim/resource boundary is next
 
 ## Completed work
 
@@ -38,10 +38,12 @@ Checkpoint 5C — bounded equipment/support conflict validation (complete); next
 - Added a task-specific Ollama Full Build JSON schema, a CLI route that expands a selected validated direction, and bounded item/mod requirement context.
 - Ran `qwen3:8b` live and validated a level-65 Ranger/Ranger1 Snipe build on the first requirement-aware attempt; evidence remains local at `.cache/live-full-build.json`.
 - Added deterministic rejection for duplicate supports/mods, case-insensitive duplicate equipment slots, shared exclusive mod groups, and prefix/suffix counts above three.
+- Added rule-level support validation using pinned allowed/excluded skill types and rejected stated attributes below the selected class base values.
+- Revalidated the preserved live Full Build against the Checkpoint 5C and 5D rules without an AI revision.
 
 ## Tests
 
-- Passing: thirty-nine unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
+- Passing: forty unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
 - Passing: all 15 data validation queries, SQLite integrity check, and foreign-key check.
 - Passing: class mapping, real projectile route, point cost, virtual-root exclusion, wrong-ascendancy rejection, enabled-ascendancy route, and missing-node rejection.
 - Passing: retrieval bounds, provenance/reasons, expected Snipe mechanics/supports, unique-data honesty, deterministic output, word-boundary matching, and unknown-skill rejection.
@@ -50,7 +52,7 @@ Checkpoint 5C — bounded equipment/support conflict validation (complete); next
 
 ## Known issues
 
-- Support compatibility currently means `recommended_by_source`; rule-level compatibility validation belongs to a later checkpoint.
+- Support validation requires both `recommended_by_source` and compatible pinned allowed/excluded skill-type rules.
 - The generated database is local and reproducible but is not packaged or redistributed.
 - The graph currently optimizes point count only; weighted build value belongs to candidate retrieval and later planning.
 - Candidate scores are deterministic heuristics for context selection, not claims of final build strength or exact DPS.
@@ -84,4 +86,4 @@ None for the next bounded implementation phase.
 
 ## Next task
 
-Add the next bounded gem and character conflict rule group using only requirements supported by pinned real data.
+Define a bounded, honest contract for unsupported qualitative and resource claims, then validate or explicitly label them without pretending to have a full calculator.

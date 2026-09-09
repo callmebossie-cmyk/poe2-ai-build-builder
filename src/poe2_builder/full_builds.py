@@ -134,7 +134,8 @@ def build_full_context(database_path: Path, direction: dict[str, object]) -> dic
             ),
             "minimum_attributes": {
                 attribute: max(
-                    [0] + [item[f"required_{attribute}"] for item in base_requirements]
+                    [character[f"base_{attribute}"]]
+                    + [item[f"required_{attribute}"] for item in base_requirements]
                 )
                 for attribute in ("strength", "dexterity", "intelligence")
             },
@@ -197,6 +198,7 @@ class FullBuildService:
                 "passive_path_valid": True,
                 "support_compatibility_valid": True,
                 "equipment_requirements_valid": True,
+                "character_requirements_valid": True,
                 "basic_conflicts_valid": True,
             },
             "request_bytes": len(json.dumps(request, ensure_ascii=False, separators=(",", ":")).encode("utf-8")),
@@ -212,6 +214,25 @@ def _non_empty_text(value: object, location: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise FullBuildValidationError(f"{location} must be a non-empty string")
     return value
+
+
+def _support_accepts_skill(support_payload: dict[str, object], skill_types: set[str]) -> bool:
+    granted_skills = support_payload.get("granted_skills", {})
+    if not isinstance(granted_skills, dict):
+        return False
+    rules = [
+        granted.get("support_gem")
+        for granted in granted_skills.values()
+        if isinstance(granted, dict) and granted.get("is_support") is True
+    ]
+    for rule in rules:
+        if not isinstance(rule, dict):
+            continue
+        allowed = set(rule.get("allowed_types") or [])
+        excluded = set(rule.get("excluded_types") or [])
+        if (not allowed or allowed & skill_types) and not excluded & skill_types:
+            return True
+    return False
 
 
 def validate_full_build(
@@ -246,6 +267,11 @@ def validate_full_build(
     for attribute in ("strength", "dexterity", "intelligence"):
         if type(attributes.get(attribute)) is not int or attributes[attribute] < 0:
             raise FullBuildValidationError(f"build.attributes.{attribute} must be a non-negative integer")
+        base_attribute = context["character"][f"base_{attribute}"]
+        if attributes[attribute] < base_attribute:
+            raise FullBuildValidationError(
+                f"build.attributes.{attribute} cannot be below the class base value"
+            )
 
     passive_ids = build.get("passive_ids")
     if not isinstance(passive_ids, list) or not passive_ids or len(passive_ids) != len(set(passive_ids)):
@@ -292,13 +318,22 @@ def validate_full_build(
     slots: set[str] = set()
     db = connect(database_path)
     try:
+        skill_row = db.execute("SELECT payload_json FROM skills WHERE id=?", (build["main_skill_id"],)).fetchone()
+        if skill_row is None:
+            raise FullBuildValidationError("main skill is missing during rule validation")
+        skill_types = set(json.loads(skill_row["payload_json"]).get("active_skill", {}).get("types", []))
         for support_id in support_ids:
             row = db.execute(
-                "SELECT relationship FROM support_compatibility WHERE skill_id=? AND support_id=?",
+                """SELECT c.relationship,s.payload_json
+                   FROM support_compatibility c
+                   JOIN support_gems s ON s.id=c.support_id
+                   WHERE c.skill_id=? AND c.support_id=?""",
                 (build["main_skill_id"], support_id),
             ).fetchone()
             if row is None or row["relationship"] != "recommended_by_source":
                 raise FullBuildValidationError(f"support is not source-compatible: {support_id}")
+            if not _support_accepts_skill(json.loads(row["payload_json"]), skill_types):
+                raise FullBuildValidationError(f"support type rules reject the main skill: {support_id}")
         for index, item in enumerate(equipment):
             if not isinstance(item, dict):
                 raise FullBuildValidationError(f"build.equipment[{index}] must be an object")

@@ -16,10 +16,10 @@ The response must include class, ascendancy, level, attributes, a connected pass
 
 - Class, ascendancy, and main skill must match the selected direction.
 - The allocation must exactly match the bounded graph-generated allocation, include the class start, and be connected under the selected ascendancy rules.
-- Supports must be selected by the direction and have `recommended_by_source` compatibility with Snipe.
+- Supports must be selected by the direction, have `recommended_by_source` compatibility with Snipe, and pass pinned allowed/excluded active-skill type rules.
 - Equipment must use a released Bow base selected by the direction.
 - Mods must be selected by the direction, meet the build level, and have a positive spawn tag shared with the base.
-- Build level and stated attributes must satisfy the recorded base requirements.
+- Build level and stated attributes must satisfy recorded equipment requirements, and attributes cannot be below the selected class base values.
 - Duplicate equipment slots, invented IDs, missing narrative fields, and malformed structures are rejected.
 - Duplicate support/mod IDs, equipment slots that differ only by case, shared exclusive mod groups, and more than three prefixes or suffixes are rejected.
 

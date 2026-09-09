@@ -40,15 +40,18 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 - A live `qwen3:8b` run produced a level-65 full build on its first attempt after requirement-aware context was added; all five deterministic validation groups passed.
 - Live full-build evidence is preserved locally at `.cache/live-full-build.json` and excluded from Git; the bounded request was 3,563 bytes.
 - Basic conflict validation rejects duplicate supports/mods, case-insensitive duplicate slots, shared exclusive mod groups, and more than three prefixes or suffixes per item.
-- Thirty-nine tests pass on Python 3.10 with resource warnings treated as errors; the pre-Ollama suite also passed on Python 3.14.
+- Gem rule validation checks support `allowed_types` and `excluded_types` against the pinned active-skill types, beyond source recommendation alone.
+- Character validation rejects stated attributes below the selected class base values; provider minimums combine class and equipment requirements.
+- The preserved live Full Build passes the new gem-rule and character-base checks without revision.
+- Forty tests pass on Python 3.10 with resource warnings treated as errors; the pre-Ollama suite also passed on Python 3.14.
 
 ## Current phase
 
-Checkpoint 5C — bounded equipment/support conflict validation is complete. Remaining gem and character conflict validation is next.
+Checkpoint 5D — bounded gem-rule and character-base validation is complete. Unsupported qualitative/resource claims remain before closing Checkpoint 5.
 
 ## Next exact action
 
-Add the next bounded gem and character conflict rule group using only requirements supported by pinned real data.
+Define a bounded, honest contract for unsupported qualitative and resource claims, then validate or explicitly label them without pretending to have a full calculator.
 
 ## Completion rule for the next phase
 

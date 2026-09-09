@@ -9,6 +9,7 @@ from poe2_builder.full_builds import (
     FullBuildService,
     FullBuildValidationError,
     OfflineFullBuildProvider,
+    _support_accepts_skill,
     build_full_context,
     validate_full_build,
 )
@@ -58,7 +59,7 @@ class FullBuildContractTests(unittest.TestCase):
         self.assertIn(self.context["character"]["class_start_id"], allocated)
         self.assertTrue(set(SELECTED_DIRECTION["passive_ids"]) <= allocated)
         self.assertEqual(self.context["equipment_requirements"]["minimum_build_level"], 65)
-        self.assertEqual(self.context["equipment_requirements"]["minimum_attributes"]["dexterity"], 12)
+        self.assertEqual(self.context["equipment_requirements"]["minimum_attributes"]["dexterity"], 15)
 
     def test_wrong_class_and_disconnected_allocation_are_rejected(self) -> None:
         wrong_class = deepcopy(self.response)
@@ -133,5 +134,28 @@ class FullBuildContractTests(unittest.TestCase):
 
         low_dexterity = deepcopy(self.response)
         low_dexterity["build"]["attributes"]["dexterity"] = 0
+        equipment_only_context = deepcopy(self.context)
+        equipment_only_context["character"]["base_dexterity"] = 0
         with self.assertRaisesRegex(FullBuildValidationError, "lacks dexterity"):
-            validate_full_build(low_dexterity, self.context, self.database)
+            validate_full_build(low_dexterity, equipment_only_context, self.database)
+
+        below_class_base = deepcopy(self.response)
+        below_class_base["build"]["attributes"]["strength"] = 6
+        with self.assertRaisesRegex(FullBuildValidationError, "class base value"):
+            validate_full_build(below_class_base, self.context, self.database)
+
+    def test_support_allowed_and_excluded_type_rules_are_enforced(self) -> None:
+        payload = {
+            "granted_skills": {
+                "support": {
+                    "is_support": True,
+                    "support_gem": {
+                        "allowed_types": ["Attack"],
+                        "excluded_types": ["Triggered"],
+                    },
+                }
+            }
+        }
+        self.assertTrue(_support_accepts_skill(payload, {"Attack", "Bow"}))
+        self.assertFalse(_support_accepts_skill(payload, {"Spell"}))
+        self.assertFalse(_support_accepts_skill(payload, {"Attack", "Triggered"}))

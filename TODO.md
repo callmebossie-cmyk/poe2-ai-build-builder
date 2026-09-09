@@ -69,5 +69,7 @@
 - [x] Run a live full-build generation and validator revision loop.
 - [x] Reject duplicate supports, mods, and case-insensitive equipment slots.
 - [x] Reject shared exclusive mod groups and more than three prefixes or suffixes per item.
-- [ ] Extend validation for remaining gem and character conflicts required by Checkpoint 5.
+- [x] Validate support allowed/excluded skill types from pinned rule metadata.
+- [x] Reject stated character attributes below the selected class base values.
+- [ ] Bound and validate unsupported qualitative/resource claims required to close Checkpoint 5.
 - [ ] Mark Checkpoint 5 complete only after the live full build passes.
