@@ -50,6 +50,30 @@ fn resolve_project_root() -> Result<PathBuf, String> {
     Err("Could not locate the PoE2 deterministic core".into())
 }
 
+pub(crate) fn run_core_command(args: &[&str]) -> Result<Vec<u8>, String> {
+    let root = resolve_project_root()?;
+    let python = std::env::var("POE2_BUILDER_PYTHON").unwrap_or_else(|_| "python".into());
+    let mut command = Command::new(python);
+    command
+        .args(["-m", "poe2_builder.cli"])
+        .args(args)
+        .current_dir(&root)
+        .env("PYTHONPATH", root.join("src"));
+    #[cfg(windows)]
+    command.creation_flags(CREATE_NO_WINDOW);
+    let output = command
+        .output()
+        .map_err(|error| format!("Could not start the deterministic core: {error}"))?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!(
+            "Deterministic core command failed: {}",
+            stderr.trim()
+        ));
+    }
+    Ok(output.stdout)
+}
+
 fn actual_for(rows: &[Value], check: &str) -> Result<i64, String> {
     rows.iter()
         .find(|row| row.get("check").and_then(Value::as_str) == Some(check))
@@ -82,26 +106,7 @@ fn parse_validation_output(stdout: &[u8]) -> Result<CoreStatus, String> {
 }
 
 pub fn read_core_status() -> Result<CoreStatus, String> {
-    let root = resolve_project_root()?;
-    let python = std::env::var("POE2_BUILDER_PYTHON").unwrap_or_else(|_| "python".into());
-    let mut command = Command::new(python);
-    command
-        .args(["-m", "poe2_builder.cli", "validate"])
-        .current_dir(&root)
-        .env("PYTHONPATH", root.join("src"));
-    #[cfg(windows)]
-    command.creation_flags(CREATE_NO_WINDOW);
-    let output = command
-        .output()
-        .map_err(|error| format!("Could not start the deterministic core: {error}"))?;
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(format!(
-            "Deterministic core validation failed: {}",
-            stderr.trim()
-        ));
-    }
-    parse_validation_output(&output.stdout)
+    parse_validation_output(&run_core_command(&["validate"])?)
 }
 
 #[cfg(test)]

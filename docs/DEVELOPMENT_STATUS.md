@@ -4,11 +4,11 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 
 ## Current phase
 
-Checkpoints 1 through 5 and Checkpoints 6A through 6B are complete. The desktop can read and render real deterministic-core health without an AI provider.
+Checkpoints 1 through 5 and Checkpoints 6A through 6C are complete. The desktop can validate the core and retrieve bounded real candidates without an AI provider.
 
 ## Current checkpoint
 
-Checkpoint 6B — read-only deterministic core status bridge (complete); Checkpoint 6C — deterministic intent/retrieval UI (next)
+Checkpoint 6C — deterministic Snipe intent and candidate-retrieval UI (complete); Checkpoint 6D — provider-gated Build Directions (next)
 
 ## Completed work
 
@@ -47,12 +47,14 @@ Checkpoint 6B — read-only deterministic core status bridge (complete); Checkpo
 - Added a minimal Tauri capability boundary with no filesystem, shell, or credential permission and generated the application icon set.
 - Added a fixed `core_status` Tauri command that invokes only Python validation, rejects failed/partial output, and returns typed summary counts.
 - Rendered real Snipe, bow-base, passive-node, provenance, and validation counts on the no-AI dashboard.
+- Added a Snipe-only intent form and a fixed retrieval command with native allowlists for playstyle, goal, and budget.
+- Added typed, bounded candidate summaries across seven categories and rendered ranked previews without invoking AI.
 
 ## Tests
 
 - Passing: forty-two unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
 - Passing: five provider-configuration tests, strict TypeScript/Vite production build, Rust `cargo check`, and Tauri release compilation without bundling.
-- Passing: two Rust bridge tests, including a real Python/SQLite validation call and failed-validation rejection.
+- Passing: four Rust bridge tests covering real Python/SQLite validation, failed-validation rejection, bounded real retrieval, and out-of-contract intent rejection.
 - Passing: all 15 data validation queries, SQLite integrity check, and foreign-key check.
 - Passing: class mapping, real projectile route, point cost, virtual-root exclusion, wrong-ascendancy rejection, enabled-ascendancy route, and missing-node rejection.
 - Passing: retrieval bounds, provenance/reasons, expected Snipe mechanics/supports, unique-data honesty, deterministic output, word-boundary matching, and unknown-skill rejection.
@@ -95,4 +97,4 @@ None for the next bounded implementation phase.
 
 ## Next task
 
-Add a bounded Snipe build-intent form and candidate-retrieval bridge without invoking AI.
+Add provider-gated Build Direction generation and cards, beginning with configured local Ollama without adding Full Build generation.

@@ -83,4 +83,7 @@
 - [x] Checkpoint 6B — connect a narrow read-only Python core status command to the desktop.
 - [x] Render real validation/database summary counts with no AI provider configured.
 - [x] Keep command names, arguments, paths, and database selection outside frontend control.
-- [ ] Checkpoint 6C — add the first deterministic Snipe build-intent and candidate-retrieval screen.
+- [x] Checkpoint 6C — add the first deterministic Snipe build-intent and candidate-retrieval screen.
+- [x] Validate the intent allowlist at the native bridge boundary.
+- [x] Return only bounded candidate previews and aggregate metadata to the desktop.
+- [ ] Checkpoint 6D — add provider-gated Build Direction generation and cards, beginning with configured local Ollama.

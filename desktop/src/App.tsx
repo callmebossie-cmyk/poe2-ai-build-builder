@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { CoreStatus, readCoreStatus } from "./coreStatus";
 import {
+  DEFAULT_INTENT,
+  RetrievalIntent,
+  RetrievalSummary,
+  retrieveCandidates,
+} from "./candidateRetrieval";
+import {
   DEFAULT_PROVIDER_CONFIG,
   PROVIDER_CONFIG_KEY,
   ProviderConfig,
@@ -33,6 +39,10 @@ export default function App() {
   const [saved, setSaved] = useState(false);
   const [core, setCore] = useState<CoreStatus | null>(null);
   const [coreError, setCoreError] = useState("");
+  const [intent, setIntent] = useState<RetrievalIntent>(DEFAULT_INTENT);
+  const [retrieval, setRetrieval] = useState<RetrievalSummary | null>(null);
+  const [retrievalError, setRetrievalError] = useState("");
+  const [retrieving, setRetrieving] = useState(false);
   const errors = useMemo(() => validateProviderConfig(config), [config]);
 
   useEffect(() => {
@@ -62,6 +72,18 @@ export default function App() {
     setSaved(true);
   };
 
+  const analyze = async () => {
+    setRetrieving(true);
+    setRetrievalError("");
+    try {
+      setRetrieval(await retrieveCandidates(intent));
+    } catch (error) {
+      setRetrievalError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setRetrieving(false);
+    }
+  };
+
   if (config.onboardingComplete) {
     const providerLabel = config.provider === "none" ? "No AI connected" : `${config.provider} · ${config.model}`;
     return (
@@ -80,6 +102,18 @@ export default function App() {
           <article><small>DATA</small><h2>PoE2 Database</h2><p>{core ? `${core.snipeSkills} Snipe skill · ${core.bowBases} released bow bases` : "Reading the local data core…"}</p><span>{core ? `${core.provenanceFiles} pinned source files` : "Available without AI"}</span></article>
           <article><small>GRAPH</small><h2>Passive Paths</h2><p>{core ? `${core.passiveNodes.toLocaleString()} passive nodes available to deterministic pathfinding.` : "Connected allocations stay owned by deterministic pathfinding."}</p><span>Available without AI</span></article>
           <article><small>RULES</small><h2>Build Validator</h2><p>{core ? `${core.passedChecks} of ${core.validationChecks} real-data checks passed.` : coreError || "Validating the read-only core…"}</p><span className={coreError ? "status-error" : ""}>{coreError ? "Core check needs attention" : "Local source of truth"}</span></article>
+        </section>
+        <section className="intent-panel">
+          <div className="section-heading"><div><small>DETERMINISTIC ANALYSIS</small><h2>Build intent</h2></div><p>No AI call. The local core ranks a bounded candidate set.</p></div>
+          <div className="intent-fields">
+            <label>Skill<select value={intent.skill} disabled><option>Snipe</option></select></label>
+            <label>Playstyle<select value={intent.playstyle} onChange={(event) => setIntent({ ...intent, playstyle: event.target.value as RetrievalIntent["playstyle"] })}><option>Fast</option><option>Balanced</option><option>Defensive</option></select></label>
+            <label>Goal<select value={intent.goal} onChange={(event) => setIntent({ ...intent, goal: event.target.value as RetrievalIntent["goal"] })}><option>Mapping</option><option>Bossing</option><option>Hybrid</option></select></label>
+            <label>Budget<select value={intent.budget} onChange={(event) => setIntent({ ...intent, budget: event.target.value as RetrievalIntent["budget"] })}><option>Cheap</option><option>Medium</option><option>Expensive</option></select></label>
+            <button className="continue" disabled={retrieving || !core} onClick={analyze}>{retrieving ? "Analyzing…" : "Analyze candidates"}</button>
+          </div>
+          {retrievalError && <p className="inline-error">{retrievalError}</p>}
+          {retrieval && <div className="retrieval-summary"><div className="retrieval-meta"><strong>{retrieval.totalCandidates} bounded candidates</strong><span>{(retrieval.serializedBytes / 1024).toFixed(1)} KB · {retrieval.playstyle} · {retrieval.goal} · {retrieval.budget}</span></div><div className="candidate-groups">{retrieval.groups.map((group) => <article key={group.category}><header><strong>{group.category.replace("_", " ")}</strong><span>{group.count}</span></header>{group.top.map((candidate) => <div className="candidate" key={candidate.id}><b>{candidate.name}</b><span>Score {candidate.score}</span><p>{candidate.reasons[0]}</p></div>)}</article>)}</div></div>}
         </section>
         <footer className="actions">
           <div><strong>Provider-neutral by design</strong><span>No provider can replace the local source of truth.</span></div>

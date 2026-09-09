@@ -51,16 +51,18 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 - Five provider-state tests, the frontend production build, Rust `cargo check`, and native release compilation pass.
 - Checkpoint 6B adds one fixed, read-only Tauri `core_status` command that invokes Python validation and returns typed aggregate counts.
 - The no-AI dashboard renders real local counts: 15/15 checks, 1 Snipe skill, 5,153 passive nodes, 35 released bow bases, and 7 provenance files.
-- Two Rust bridge tests pass, including a real Python/SQLite invocation and failed-validation rejection.
+- Checkpoint 6C adds a Snipe build-intent form and a fixed candidate-retrieval bridge with native allowlist validation.
+- The no-AI desktop renders a bounded summary across seven candidate categories, with at most three previews per category.
+- Four Rust bridge tests, five provider-state tests, the production frontend build, and all forty-two Python tests pass.
 
 ## Current phase
 
-Checkpoint 6B — read-only deterministic core status bridge is complete. Checkpoint 6C — deterministic build-intent and retrieval UI is next.
+Checkpoint 6C — deterministic Snipe intent and candidate-retrieval UI is complete. Checkpoint 6D — provider-gated Build Directions is next.
 
 ## Next exact action
 
-Add the first Snipe build-intent form and expose bounded candidate retrieval through another narrow typed bridge command, without invoking AI.
+Add provider-gated Build Direction generation and direction cards, beginning with configured local Ollama while keeping provider mode `none` fully deterministic.
 
 ## Completion rule for the next phase
 
-Validate inputs in both Rust and Python-facing boundaries, keep retrieval bounded, and do not add AI calls or the complete workflow in the same phase.
+Do not invoke AI unless a compatible provider is configured. Keep the provider boundary typed and do not add Full Build generation in the same phase.

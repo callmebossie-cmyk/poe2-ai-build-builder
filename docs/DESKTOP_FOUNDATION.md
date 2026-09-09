@@ -37,3 +37,13 @@ The native shell exposes one narrow `core_status` command. It runs the fixed Pyt
 - Python and the SQLite database remain the current source of truth; this phase does not duplicate game rules in Rust or TypeScript.
 - `POE2_BUILDER_ROOT` and `POE2_BUILDER_PYTHON` are explicit development/runtime overrides for locating the core. Packaging a sidecar belongs to a later distribution phase.
 - The dashboard invokes the bridge after onboarding, including when provider mode is `none`, and renders real Snipe, bow-base, passive-node, provenance, and validation counts.
+
+## Checkpoint 6C deterministic retrieval
+
+The dashboard provides a Snipe-only build-intent form for playstyle, goal, and budget. Its `retrieve_candidates` bridge accepts only enumerated values, runs the fixed Python `retrieve` command, and returns a typed summary rather than the full context.
+
+- The Python retriever remains responsible for ranking and bounds.
+- The native bridge refuses unknown skills, playstyles, goals, and budgets before starting Python.
+- The response includes total/category counts, serialized context size, and at most three preview records per category.
+- The UI renders mechanics, supports, passives, ascendancies, item bases, mods, and uniques with their scores and first evidence reason.
+- This flow works with provider mode `none` and performs no AI or network request.
