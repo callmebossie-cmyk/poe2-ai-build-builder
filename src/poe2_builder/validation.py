@@ -52,4 +52,3 @@ def snipe_summary(path: Path) -> dict[str, object]:
         skill["bow_mods"] = [dict(row) for row in db.execute("SELECT DISTINCT m.id,m.name,m.text FROM mods m JOIN mod_tags t ON t.mod_id=m.id WHERE t.tag='bow' AND t.kind='spawn' AND t.weight>0 ORDER BY m.required_level,m.name LIMIT 10")]
         skill["sources"] = [dict(row) for row in db.execute("SELECT name,version,file_name,sha256 FROM data_sources ORDER BY file_name")]
         return skill
-

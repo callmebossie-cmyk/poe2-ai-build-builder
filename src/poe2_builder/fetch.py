@@ -63,4 +63,3 @@ def verify_manifest(cache_dir: Path) -> dict:
         if actual != record["sha256"]:
             raise ValueError(f"Checksum mismatch for {path.name}")
     return manifest
-

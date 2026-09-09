@@ -27,4 +27,3 @@ class RealDataCheckpointTests(unittest.TestCase):
         self.assertGreater(len(summary["bow_bases"]), 0)
         self.assertGreater(len(summary["bow_mods"]), 0)
         self.assertEqual(len(summary["sources"]), 6)
-

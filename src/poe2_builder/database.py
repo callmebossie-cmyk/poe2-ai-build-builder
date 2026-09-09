@@ -164,4 +164,3 @@ def connect(path: Path) -> sqlite3.Connection:
 
 def json_text(value: object) -> str:
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
-
