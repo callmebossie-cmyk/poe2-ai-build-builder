@@ -64,7 +64,8 @@
 - [x] Build a connected passive allocation from the real graph.
 - [x] Validate selected entities, source-recommended supports, released bow bases, mod spawn tags, level requirements, and base attributes.
 - [x] Add an explicitly labeled offline full-build fixture and rejection tests.
-- [ ] Add the full-build schema to the live Ollama adapter.
-- [ ] Run a live full-build generation and validator revision loop.
+- [x] Add the full-build schema to the live Ollama adapter.
+- [x] Supply deterministic item/mod level and attribute requirements to the live provider.
+- [x] Run a live full-build generation and validator revision loop.
 - [ ] Extend validation for remaining basic conflicts required by Checkpoint 5.
 - [ ] Mark Checkpoint 5 complete only after the live full build passes.

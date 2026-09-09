@@ -11,6 +11,7 @@ from .graph import PassiveGraph, PathNotFoundError
 from .importer import build_database
 from .retrieval import BuildIntent, CandidateRetriever
 from .ollama_provider import OllamaProvider
+from .full_builds import FullBuildService
 from .validation import snipe_summary, validate_database
 
 
@@ -46,6 +47,12 @@ def parser() -> argparse.ArgumentParser:
     ollama.add_argument("--budget", default="Cheap")
     ollama.add_argument("--quality", choices=[mode.value for mode in QualityMode], default=QualityMode.BALANCED.value)
     ollama.add_argument("--output", type=Path)
+    full_build = commands.add_parser("full-build-ollama", help="expand a validated direction through local Ollama")
+    full_build.add_argument("--model", default="qwen3:8b")
+    full_build.add_argument("--endpoint", default="http://127.0.0.1:11434/api/chat")
+    full_build.add_argument("--directions", type=Path, default=Path(".cache/live-directions.json"))
+    full_build.add_argument("--direction-id", default="direction_2")
+    full_build.add_argument("--output", type=Path, default=Path(".cache/live-full-build.json"))
     commands.add_parser("all", help="fetch, build, validate, and show Snipe data")
     return result
 
@@ -115,6 +122,24 @@ def main() -> None:
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print_json(result)
+    if args.command == "full-build-ollama":
+        directions_result = json.loads(args.directions.read_text(encoding="utf-8"))
+        matches = [
+            direction
+            for direction in directions_result.get("directions", [])
+            if direction.get("direction_id") == args.direction_id
+        ]
+        if len(matches) != 1:
+            raise ValueError(f"Expected exactly one validated direction with ID {args.direction_id!r}")
+        service = FullBuildService(
+            args.database,
+            OllamaProvider(model=args.model, endpoint=args.endpoint),
+            max_attempts=3,
+        )
+        result = service.generate(matches[0])
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         print_json(result)
 
 

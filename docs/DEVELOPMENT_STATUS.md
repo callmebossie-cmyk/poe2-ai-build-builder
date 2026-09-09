@@ -4,11 +4,11 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 
 ## Current phase
 
-Checkpoints 1 through 4 and Checkpoint 5A are complete. Checkpoint 5B remains open.
+Checkpoints 1 through 4 and Checkpoints 5A through 5B are complete. Checkpoint 5C remains open.
 
 ## Current checkpoint
 
-Checkpoint 5A — bounded Full Build contract and deterministic validator (complete); Checkpoint 5B — live full-build run (next)
+Checkpoint 5B — schema-constrained live Full Build run (complete); Checkpoint 5C — remaining basic conflict validation (next)
 
 ## Completed work
 
@@ -35,10 +35,12 @@ Checkpoint 5A — bounded Full Build contract and deterministic validator (compl
 - Selected the validated Ranger/Ranger1 Projectile Speed Boost direction for the first bounded full-build slice.
 - Added a provider-neutral full-build contract, graph-derived passive allocation, deterministic validator, and explicitly labeled offline fixture.
 - Added validation for selected entity IDs, passive connectivity, source support relationships, released Bow bases, positive mod spawn tags, item/mod levels, base attributes, and duplicate slots.
+- Added a task-specific Ollama Full Build JSON schema, a CLI route that expands a selected validated direction, and bounded item/mod requirement context.
+- Ran `qwen3:8b` live and validated a level-65 Ranger/Ranger1 Snipe build on the first requirement-aware attempt; evidence remains local at `.cache/live-full-build.json`.
 
 ## Tests
 
-- Passing: thirty-four unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
+- Passing: thirty-six unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
 - Passing: all 15 data validation queries, SQLite integrity check, and foreign-key check.
 - Passing: class mapping, real projectile route, point cost, virtual-root exclusion, wrong-ascendancy rejection, enabled-ascendancy route, and missing-node rejection.
 - Passing: retrieval bounds, provenance/reasons, expected Snipe mechanics/supports, unique-data honesty, deterministic output, word-boundary matching, and unknown-skill rejection.
@@ -52,7 +54,7 @@ Checkpoint 5A — bounded Full Build contract and deterministic validator (compl
 - The graph currently optimizes point count only; weighted build value belongs to candidate retrieval and later planning.
 - Candidate scores are deterministic heuristics for context selection, not claims of final build strength or exact DPS.
 - Unique effect data is absent from the selected RePoE export and remains unscored until a permitted, versioned source is integrated.
-- The first live run is validated structurally and against candidate references, but its qualitative theorycrafting claims are not yet full-build or calculation-engine validated.
+- Qualitative theorycrafting claims, exact DPS, and deeper equipment/gem conflicts are not calculation-engine validated.
 
 ## Current blockers
 
@@ -81,4 +83,4 @@ None for the next bounded implementation phase.
 
 ## Next task
 
-Add a schema-constrained live Ollama full-build route and validate its output without weakening the deterministic checks.
+Extend deterministic validation for the remaining basic conflicts required by Checkpoint 5, one bounded rule group at a time.

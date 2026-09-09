@@ -4,7 +4,7 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 
 ## Current state
 
-- Checkpoints 1 through 4 are complete.
+- Checkpoints 1 through 4 and Checkpoints 5A through 5B are complete.
 - A dependency-free Python data core downloads seven pinned real-data exports, verifies SHA-256 checksums, and builds `data/poe2.db` locally.
 - The generated database contains Snipe, its real tags/levels/stat sets, 15 source-recommended supports, the complete passive tree, ascendancies, item bases, mods, and per-file provenance.
 - Downloaded JSON and the generated database are excluded from Git.
@@ -36,15 +36,18 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 - A live `qwen3:8b` run returned three materially distinct, schema-valid directions with valid entity references on its first attempt.
 - Live evidence is preserved locally at `.cache/live-directions.json` and excluded from Git; the bounded request was 27,293 bytes.
 - The first full-build slice expands the validated Ranger direction into an exact graph-connected allocation and checks supports, Bow base, affix spawn tags, levels, and base attributes against SQLite.
-- Thirty-four tests pass on Python 3.10 with resource warnings treated as errors; the pre-Ollama suite also passed on Python 3.14.
+- The local Ollama full-build route uses a task-specific JSON schema bounded to the selected direction and deterministic equipment requirements.
+- A live `qwen3:8b` run produced a level-65 full build on its first attempt after requirement-aware context was added; all five deterministic validation groups passed.
+- Live full-build evidence is preserved locally at `.cache/live-full-build.json` and excluded from Git; the bounded request was 3,563 bytes.
+- Thirty-six tests pass on Python 3.10 with resource warnings treated as errors; the pre-Ollama suite also passed on Python 3.14.
 
 ## Current phase
 
-Checkpoint 5A — bounded Full Build contract and deterministic validator is complete. Checkpoint 5B — live full-build execution remains open.
+Checkpoint 5B — schema-constrained live Full Build execution is complete. Checkpoint 5C — remaining basic conflict validation is next.
 
 ## Next exact action
 
-Add a schema-constrained live Ollama full-build route for the selected Ranger direction without weakening deterministic validation.
+Extend deterministic validation for the remaining basic conflicts required by Checkpoint 5, one bounded rule group at a time.
 
 ## Completion rule for the next phase
 

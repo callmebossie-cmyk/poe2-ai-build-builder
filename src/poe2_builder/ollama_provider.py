@@ -80,6 +80,101 @@ def direction_json_schema(context: dict[str, object]) -> dict[str, object]:
     }
 
 
+def full_build_json_schema(context: dict[str, object]) -> dict[str, object]:
+    direction = context["selected_direction"]
+    passive_ids = context["suggested_connected_passive_ids"]
+    requirements = context.get("equipment_requirements", {})
+    minimum_attributes = requirements.get("minimum_attributes", {})
+    string = {"type": "string", "minLength": 1}
+    attributes = {
+        "type": "object",
+        "properties": {
+            name: {"type": "integer", "minimum": minimum_attributes.get(name, 0)}
+            for name in ("strength", "dexterity", "intelligence")
+        },
+        "required": ["strength", "dexterity", "intelligence"],
+        "additionalProperties": False,
+    }
+    skill_link = {
+        "type": "object",
+        "properties": {
+            "skill_id": {"type": "string", "enum": [direction["skill_id"]]},
+            "support_ids": {
+                "type": "array",
+                "items": {"type": "string", "enum": direction["support_ids"]},
+                "minItems": 1,
+                "uniqueItems": True,
+            },
+        },
+        "required": ["skill_id", "support_ids"],
+        "additionalProperties": False,
+    }
+    equipment = {
+        "type": "object",
+        "properties": {
+            "slot": string,
+            "item_base_id": {"type": "string", "enum": direction["item_base_ids"]},
+            "mod_ids": {
+                "type": "array",
+                "items": {"type": "string", "enum": direction["mod_ids"]},
+                "minItems": 1,
+                "uniqueItems": True,
+            },
+        },
+        "required": ["slot", "item_base_id", "mod_ids"],
+        "additionalProperties": False,
+    }
+    properties = {
+        "build_id": string,
+        "title": string,
+        "level": {
+            "type": "integer",
+            "minimum": requirements.get("minimum_build_level", 1),
+            "maximum": 100,
+        },
+        "class_name": {"type": "string", "enum": [direction["class_name"]]},
+        "ascendancy_id": {"type": "string", "enum": [direction["ascendancy_id"]]},
+        "main_skill_id": {"type": "string", "enum": [direction["skill_id"]]},
+        "attributes": attributes,
+        "passive_ids": {
+            "type": "array",
+            "items": {"type": "string", "enum": passive_ids},
+            "minItems": len(passive_ids),
+            "maxItems": len(passive_ids),
+            "uniqueItems": True,
+        },
+        "skill_links": {
+            "type": "array",
+            "items": skill_link,
+            "minItems": 1,
+            "maxItems": 1,
+        },
+        "equipment": {"type": "array", "items": equipment, "minItems": 1},
+        "passive_direction": string,
+        "affix_priorities": {"type": "array", "items": string, "minItems": 1},
+        "defense": string,
+        "resource_solution": string,
+        "leveling_concept": string,
+        "upgrade_order": {"type": "array", "items": string, "minItems": 1},
+        "rotation": string,
+    }
+    build = {
+        "type": "object",
+        "properties": properties,
+        "required": list(properties),
+        "additionalProperties": False,
+    }
+    return {
+        "type": "object",
+        "properties": {
+            "schema_version": {"type": "integer", "enum": [1]},
+            "build": build,
+        },
+        "required": ["schema_version", "build"],
+        "additionalProperties": False,
+    }
+
+
 @dataclass
 class OllamaProvider:
     model: str = "qwen3:8b"
@@ -94,12 +189,20 @@ class OllamaProvider:
 
     def generate(self, request: dict[str, object]) -> str:
         context = request["build_context"]
-        schema = direction_json_schema(context)
+        if request.get("task") == "generate_full_build":
+            schema = full_build_json_schema(context)
+            task_instruction = (
+                "Expand the one selected direction into one full build. Copy the complete supplied "
+                "passive allocation and choose only entity IDs present in that direction."
+            )
+        else:
+            schema = direction_json_schema(context)
+            task_instruction = "Make the three build directions materially distinct."
         system = (
             "You are the theorycrafting component of a Path of Exile 2 build planner. "
-            "Treat the supplied candidate records as the complete allowed entity set. "
-            "Return only the requested JSON. Do not invent IDs, exact DPS, prices, item effects, "
-            "or game rules absent from the context. Make the three directions materially distinct."
+            "Treat the supplied context as the complete allowed entity set. Return only the "
+            "requested JSON. Do not invent IDs, exact DPS, prices, item effects, or game rules "
+            f"absent from the context. {task_instruction}"
         )
         prompt = json.dumps(request, ensure_ascii=False, separators=(",", ":"))
         body = {

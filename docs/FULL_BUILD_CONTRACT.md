@@ -1,6 +1,6 @@
 # Full Build Contract
 
-Checkpoint 5A defines the first bounded full-build contract and deterministic validator.
+Checkpoint 5A defines the first bounded full-build contract and deterministic validator. Checkpoint 5B adds and validates the live local-Ollama route.
 
 ## Selected direction
 
@@ -22,6 +22,12 @@ The response must include class, ascendancy, level, attributes, a connected pass
 - Build level and stated attributes must satisfy the recorded base requirements.
 - Duplicate equipment slots, invented IDs, missing narrative fields, and malformed structures are rejected.
 
-## Boundary of Checkpoint 5A
+## Live Checkpoint 5B evidence
 
-The offline provider is a contract fixture, not an AI recommendation. Checkpoint 5 remains open until a live provider expands the selected direction and the returned full build passes this validator. Exact DPS, complete gem-rule compatibility, computed passive attributes, and deeper conflict detection remain outside this first slice and must not be claimed as validated.
+The provider receives explicit, deterministic minimum level and base-attribute requirements for the selected equipment and mods. Its JSON schema restricts every entity reference to the selected direction and requires the complete graph-generated passive allocation.
+
+On 2026-09-09, local `qwen3:8b` generated a level-65 Ranger/Ranger1 Snipe full build in one requirement-aware attempt. The 3,563-byte request used no database path or raw exports, and the result passed schema, entity-reference, passive-path, source-support, and equipment-requirement validation. Evidence is stored locally at ignored path `.cache/live-full-build.json`.
+
+## Remaining Checkpoint 5 boundary
+
+The offline provider remains a contract fixture, not an AI recommendation. The live full-build slice now passes, but Checkpoint 5 remains open for the remaining basic conflict rules. Exact DPS, complete gem-rule compatibility, computed passive attributes, and deeper conflict detection must not be claimed as validated.

@@ -87,6 +87,30 @@ def build_full_context(database_path: Path, direction: dict[str, object]) -> dic
         skill = db.execute("SELECT id,name FROM skills WHERE id=?", (direction["skill_id"],)).fetchone()
         if skill is None:
             raise FullBuildValidationError("direction skill does not exist")
+        base_requirements = []
+        for base_id in direction.get("item_base_ids", []):
+            base = db.execute(
+                "SELECT id,name,drop_level,payload_json FROM item_bases WHERE id=?", (base_id,)
+            ).fetchone()
+            if base is None:
+                raise FullBuildValidationError(f"direction item base does not exist: {base_id}")
+            requirements = json.loads(base["payload_json"]).get("requirements", {})
+            base_requirements.append(
+                {
+                    "id": base["id"],
+                    "name": base["name"],
+                    "required_level": max(base["drop_level"] or 1, requirements.get("level", 1)),
+                    "required_strength": requirements.get("strength", 0),
+                    "required_dexterity": requirements.get("dexterity", 0),
+                    "required_intelligence": requirements.get("intelligence", 0),
+                }
+            )
+        mod_requirements = []
+        for mod_id in direction.get("mod_ids", []):
+            mod = db.execute("SELECT id,required_level FROM mods WHERE id=?", (mod_id,)).fetchone()
+            if mod is None:
+                raise FullBuildValidationError(f"direction mod does not exist: {mod_id}")
+            mod_requirements.append({"id": mod["id"], "required_level": mod["required_level"] or 1})
     finally:
         db.close()
     return {
@@ -100,6 +124,21 @@ def build_full_context(database_path: Path, direction: dict[str, object]) -> dic
         },
         "skill": dict(skill),
         "suggested_connected_passive_ids": sorted(suggested),
+        "equipment_requirements": {
+            "item_bases": base_requirements,
+            "mods": mod_requirements,
+            "minimum_build_level": max(
+                [1]
+                + [item["required_level"] for item in base_requirements]
+                + [mod["required_level"] for mod in mod_requirements]
+            ),
+            "minimum_attributes": {
+                attribute: max(
+                    [0] + [item[f"required_{attribute}"] for item in base_requirements]
+                )
+                for attribute in ("strength", "dexterity", "intelligence")
+            },
+        },
     }
 
 
@@ -142,7 +181,7 @@ class FullBuildService:
                 request["validation_feedback"] = str(last_error)
         else:
             raise last_error
-        return {
+        result = {
             "schema_version": 1,
             "provider": {
                 "name": self.provider.name,
@@ -159,8 +198,13 @@ class FullBuildService:
                 "support_compatibility_valid": True,
                 "equipment_requirements_valid": True,
             },
+            "request_bytes": len(json.dumps(request, ensure_ascii=False, separators=(",", ":")).encode("utf-8")),
             "attempts": attempt,
         }
+        runtime_metadata = getattr(self.provider, "last_metadata", None)
+        if runtime_metadata:
+            result["provider"]["runtime"] = runtime_metadata
+        return result
 
 
 def _non_empty_text(value: object, location: str) -> str:

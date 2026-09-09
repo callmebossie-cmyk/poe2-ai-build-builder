@@ -57,6 +57,8 @@ class FullBuildContractTests(unittest.TestCase):
         allocated = set(self.context["suggested_connected_passive_ids"])
         self.assertIn(self.context["character"]["class_start_id"], allocated)
         self.assertTrue(set(SELECTED_DIRECTION["passive_ids"]) <= allocated)
+        self.assertEqual(self.context["equipment_requirements"]["minimum_build_level"], 65)
+        self.assertEqual(self.context["equipment_requirements"]["minimum_attributes"]["dexterity"], 12)
 
     def test_wrong_class_and_disconnected_allocation_are_rejected(self) -> None:
         wrong_class = deepcopy(self.response)

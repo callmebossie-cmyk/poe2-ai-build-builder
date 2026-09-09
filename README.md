@@ -4,7 +4,7 @@ Desktop build-planning tool for Path of Exile 2. The application will combine re
 
 ## Current status
 
-Checkpoint 1 implements a real-data Snipe import pipeline. It downloads pinned GGG/RePoE exports locally, verifies checksums, builds a normalized SQLite database, and validates the checkpoint acceptance criteria. Downloaded data and generated databases are ignored by Git.
+Checkpoints 1 through 4 and the first two Checkpoint 5 slices are complete: real-data import, passive graph, candidate retrieval, live AI build directions, deterministic Full Build validation, and a validated live local-Ollama Full Build route. Downloaded data, generated databases, and live AI evidence are ignored by Git.
 
 ## Data proof of concept
 
@@ -20,6 +20,7 @@ python -m poe2_builder.cli graph-demo --class-name Ranger
 python -m poe2_builder.cli retrieve --skill Snipe --playstyle Fast --goal Mapping --budget Cheap
 python -m poe2_builder.cli directions-contract-demo
 python -m poe2_builder.cli directions-ollama --model qwen3:8b --output .cache/live-directions.json
+python -m poe2_builder.cli full-build-ollama --model qwen3:8b --direction-id direction_2 --output .cache/live-full-build.json
 ```
 
 Run the unit tests with:
