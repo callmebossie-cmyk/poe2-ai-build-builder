@@ -778,10 +778,19 @@ AIProvider
 ├── OpenAI
 ├── Anthropic
 ├── Google
-└── Local (future)
+└── Local (เช่น Ollama)
 ```
 
 User เป็นคนใส่ credential ของตัวเอง
+
+ตัวโปรแกรมต้องเป็น **provider-neutral standalone core** ตั้งแต่ติดตั้ง:
+
+-   มี Database, Retrieval, Graph, Calculator และ Validator ในตัว
+-   ไม่ผูก Ollama, cloud API หรือ model ใดเป็น backend ถาวร
+-   เปิดครั้งแรกต้องให้ User เลือก AI Provider, endpoint, model และ quality mode
+-   ต้องอนุญาตให้ข้ามการเชื่อม AI และใช้ความสามารถ deterministic ได้
+-   Local provider ไม่ใช้ credential; cloud provider ใช้ credential ของ User
+-   Ollama ที่ใช้ระหว่างพัฒนาเป็น provider แรกเพื่อพิสูจน์ระบบ ไม่ใช่ข้อบังคับของโปรแกรมสำเร็จรูป
 
 ``` text
 Settings
@@ -1496,6 +1505,10 @@ Validation results
 Settings
 AI Provider configuration
 ```
+
+First-run onboarding ต้องถามก่อนใช้งาน AI ว่าจะเชื่อมต่อกับอะไร เช่น Local Ollama,
+cloud API ที่รองรับ หรือยังไม่เชื่อม AI และต้องเปลี่ยน provider ภายหลังได้จาก Settings
+โดยไม่กระทบ Database, Graph, Calculator หรือ Validator
 
 ------------------------------------------------------------------------
 

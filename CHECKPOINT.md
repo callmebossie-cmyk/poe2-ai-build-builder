@@ -39,15 +39,16 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 - The local Ollama full-build route uses a task-specific JSON schema bounded to the selected direction and deterministic equipment requirements.
 - A live `qwen3:8b` run produced a level-65 full build on its first attempt after requirement-aware context was added; all five deterministic validation groups passed.
 - Live full-build evidence is preserved locally at `.cache/live-full-build.json` and excluded from Git; the bounded request was 3,563 bytes.
-- Thirty-six tests pass on Python 3.10 with resource warnings treated as errors; the pre-Ollama suite also passed on Python 3.14.
+- Basic conflict validation rejects duplicate supports/mods, case-insensitive duplicate slots, shared exclusive mod groups, and more than three prefixes or suffixes per item.
+- Thirty-nine tests pass on Python 3.10 with resource warnings treated as errors; the pre-Ollama suite also passed on Python 3.14.
 
 ## Current phase
 
-Checkpoint 5B — schema-constrained live Full Build execution is complete. Checkpoint 5C — remaining basic conflict validation is next.
+Checkpoint 5C — bounded equipment/support conflict validation is complete. Remaining gem and character conflict validation is next.
 
 ## Next exact action
 
-Extend deterministic validation for the remaining basic conflicts required by Checkpoint 5, one bounded rule group at a time.
+Add the next bounded gem and character conflict rule group using only requirements supported by pinned real data.
 
 ## Completion rule for the next phase
 

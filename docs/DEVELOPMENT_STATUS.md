@@ -4,11 +4,11 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 
 ## Current phase
 
-Checkpoints 1 through 4 and Checkpoints 5A through 5B are complete. Checkpoint 5C remains open.
+Checkpoints 1 through 4 and Checkpoints 5A through 5C are complete. Remaining Checkpoint 5 gem and character conflict validation is open.
 
 ## Current checkpoint
 
-Checkpoint 5B — schema-constrained live Full Build run (complete); Checkpoint 5C — remaining basic conflict validation (next)
+Checkpoint 5C — bounded equipment/support conflict validation (complete); next bounded gem and character conflict rules remain open
 
 ## Completed work
 
@@ -37,10 +37,11 @@ Checkpoint 5B — schema-constrained live Full Build run (complete); Checkpoint 
 - Added validation for selected entity IDs, passive connectivity, source support relationships, released Bow bases, positive mod spawn tags, item/mod levels, base attributes, and duplicate slots.
 - Added a task-specific Ollama Full Build JSON schema, a CLI route that expands a selected validated direction, and bounded item/mod requirement context.
 - Ran `qwen3:8b` live and validated a level-65 Ranger/Ranger1 Snipe build on the first requirement-aware attempt; evidence remains local at `.cache/live-full-build.json`.
+- Added deterministic rejection for duplicate supports/mods, case-insensitive duplicate equipment slots, shared exclusive mod groups, and prefix/suffix counts above three.
 
 ## Tests
 
-- Passing: thirty-six unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
+- Passing: thirty-nine unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
 - Passing: all 15 data validation queries, SQLite integrity check, and foreign-key check.
 - Passing: class mapping, real projectile route, point cost, virtual-root exclusion, wrong-ascendancy rejection, enabled-ascendancy route, and missing-node rejection.
 - Passing: retrieval bounds, provenance/reasons, expected Snipe mechanics/supports, unique-data honesty, deterministic output, word-boundary matching, and unknown-skill rejection.
@@ -83,4 +84,4 @@ None for the next bounded implementation phase.
 
 ## Next task
 
-Extend deterministic validation for the remaining basic conflicts required by Checkpoint 5, one bounded rule group at a time.
+Add the next bounded gem and character conflict rule group using only requirements supported by pinned real data.

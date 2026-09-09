@@ -197,6 +197,7 @@ class FullBuildService:
                 "passive_path_valid": True,
                 "support_compatibility_valid": True,
                 "equipment_requirements_valid": True,
+                "basic_conflicts_valid": True,
             },
             "request_bytes": len(json.dumps(request, ensure_ascii=False, separators=(",", ":")).encode("utf-8")),
             "attempts": attempt,
@@ -282,6 +283,8 @@ def validate_full_build(
     support_ids = link.get("support_ids")
     if not isinstance(support_ids, list) or not support_ids or not set(support_ids) <= allowed["support_ids"]:
         raise FullBuildValidationError("skill link contains unsupported or out-of-direction supports")
+    if len(support_ids) != len(set(support_ids)):
+        raise FullBuildValidationError("skill link contains duplicate supports")
 
     equipment = build.get("equipment")
     if not isinstance(equipment, list) or not equipment:
@@ -300,15 +303,18 @@ def validate_full_build(
             if not isinstance(item, dict):
                 raise FullBuildValidationError(f"build.equipment[{index}] must be an object")
             slot = _non_empty_text(item.get("slot"), f"build.equipment[{index}].slot")
-            if slot in slots:
+            normalized_slot = slot.casefold()
+            if normalized_slot in slots:
                 raise FullBuildValidationError(f"duplicate equipment slot: {slot}")
-            slots.add(slot)
+            slots.add(normalized_slot)
             base_id = item.get("item_base_id")
             mod_ids = item.get("mod_ids")
             if base_id not in allowed["item_base_ids"]:
                 raise FullBuildValidationError(f"equipment base is outside the selected direction: {base_id}")
             if not isinstance(mod_ids, list) or not mod_ids or not set(mod_ids) <= allowed["mod_ids"]:
                 raise FullBuildValidationError("equipment contains unknown or out-of-direction mods")
+            if len(mod_ids) != len(set(mod_ids)):
+                raise FullBuildValidationError("equipment contains duplicate mods")
             base = db.execute(
                 "SELECT item_class,drop_level,release_state,payload_json FROM item_bases WHERE id=?",
                 (base_id,),
@@ -323,8 +329,12 @@ def validate_full_build(
                 if attributes[attribute] < requirements.get(attribute, 0):
                     raise FullBuildValidationError(f"build lacks {attribute} for equipment")
             base_tags = set(payload.get("tags", []))
+            occupied_groups: set[str] = set()
+            affix_counts = {"prefix": 0, "suffix": 0}
             for mod_id in mod_ids:
-                mod = db.execute("SELECT required_level FROM mods WHERE id=?", (mod_id,)).fetchone()
+                mod = db.execute(
+                    "SELECT generation_type,required_level,payload_json FROM mods WHERE id=?", (mod_id,)
+                ).fetchone()
                 if mod is None or build["level"] < (mod["required_level"] or 1):
                     raise FullBuildValidationError(f"mod is unavailable at build level: {mod_id}")
                 spawn_tags = {
@@ -336,6 +346,20 @@ def validate_full_build(
                 }
                 if not base_tags & spawn_tags:
                     raise FullBuildValidationError(f"mod cannot spawn on selected base: {mod_id}")
+                mod_payload = json.loads(mod["payload_json"])
+                groups = set(mod_payload.get("groups", []))
+                conflict = occupied_groups & groups
+                if conflict:
+                    raise FullBuildValidationError(
+                        f"equipment mods share an exclusive group: {sorted(conflict)[0]}"
+                    )
+                occupied_groups.update(groups)
+                if mod["generation_type"] in affix_counts:
+                    affix_counts[mod["generation_type"]] += 1
+                    if affix_counts[mod["generation_type"]] > 3:
+                        raise FullBuildValidationError(
+                            f"equipment exceeds three {mod['generation_type']} modifiers"
+                        )
     finally:
         db.close()
     return build

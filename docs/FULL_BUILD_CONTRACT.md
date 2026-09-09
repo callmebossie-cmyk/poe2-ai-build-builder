@@ -21,6 +21,7 @@ The response must include class, ascendancy, level, attributes, a connected pass
 - Mods must be selected by the direction, meet the build level, and have a positive spawn tag shared with the base.
 - Build level and stated attributes must satisfy the recorded base requirements.
 - Duplicate equipment slots, invented IDs, missing narrative fields, and malformed structures are rejected.
+- Duplicate support/mod IDs, equipment slots that differ only by case, shared exclusive mod groups, and more than three prefixes or suffixes are rejected.
 
 ## Live Checkpoint 5B evidence
 

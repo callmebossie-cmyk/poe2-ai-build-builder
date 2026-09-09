@@ -82,6 +82,49 @@ class FullBuildContractTests(unittest.TestCase):
         with self.assertRaisesRegex(FullBuildValidationError, "mods"):
             validate_full_build(bad_mod, self.context, self.database)
 
+    def test_duplicate_supports_mods_and_casefolded_slots_are_rejected(self) -> None:
+        duplicate_support = deepcopy(self.response)
+        support = duplicate_support["build"]["skill_links"][0]["support_ids"][0]
+        duplicate_support["build"]["skill_links"][0]["support_ids"].append(support)
+        with self.assertRaisesRegex(FullBuildValidationError, "duplicate supports"):
+            validate_full_build(duplicate_support, self.context, self.database)
+
+        duplicate_mod = deepcopy(self.response)
+        mod = duplicate_mod["build"]["equipment"][0]["mod_ids"][0]
+        duplicate_mod["build"]["equipment"][0]["mod_ids"].append(mod)
+        with self.assertRaisesRegex(FullBuildValidationError, "duplicate mods"):
+            validate_full_build(duplicate_mod, self.context, self.database)
+
+        duplicate_slot = deepcopy(self.response)
+        second_item = deepcopy(duplicate_slot["build"]["equipment"][0])
+        second_item["slot"] = duplicate_slot["build"]["equipment"][0]["slot"].upper()
+        duplicate_slot["build"]["equipment"].append(second_item)
+        with self.assertRaisesRegex(FullBuildValidationError, "duplicate equipment slot"):
+            validate_full_build(duplicate_slot, self.context, self.database)
+
+    def test_mods_in_the_same_exclusive_group_are_rejected(self) -> None:
+        conflicting_mod = "AbyssModBowSpearAmanamuSuffixCompanionAndLocalAttackSpeed"
+        context = deepcopy(self.context)
+        context["selected_direction"]["mod_ids"].append(conflicting_mod)
+        response = deepcopy(self.response)
+        response["build"]["equipment"][0]["mod_ids"].append(conflicting_mod)
+        with self.assertRaisesRegex(FullBuildValidationError, "exclusive group"):
+            validate_full_build(response, context, self.database)
+
+    def test_more_than_three_prefixes_are_rejected(self) -> None:
+        prefixes = [
+            "LocalAddedPhysicalDamage1",
+            "LocalAddedFireDamage1",
+            "LocalAddedColdDamage1",
+            "LocalAddedLightningDamage1",
+        ]
+        context = deepcopy(self.context)
+        context["selected_direction"]["mod_ids"] = prefixes
+        response = deepcopy(self.response)
+        response["build"]["equipment"][0]["mod_ids"] = prefixes
+        with self.assertRaisesRegex(FullBuildValidationError, "exceeds three prefix"):
+            validate_full_build(response, context, self.database)
+
     def test_level_and_attribute_requirements_are_enforced(self) -> None:
         underleveled = deepcopy(self.response)
         underleveled["build"]["level"] = 10

@@ -67,5 +67,7 @@
 - [x] Add the full-build schema to the live Ollama adapter.
 - [x] Supply deterministic item/mod level and attribute requirements to the live provider.
 - [x] Run a live full-build generation and validator revision loop.
-- [ ] Extend validation for remaining basic conflicts required by Checkpoint 5.
+- [x] Reject duplicate supports, mods, and case-insensitive equipment slots.
+- [x] Reject shared exclusive mod groups and more than three prefixes or suffixes per item.
+- [ ] Extend validation for remaining gem and character conflicts required by Checkpoint 5.
 - [ ] Mark Checkpoint 5 complete only after the live full build passes.
