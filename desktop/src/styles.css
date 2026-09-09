@@ -42,6 +42,7 @@ h1 em { color: #d9aa5b; font-weight: 500; }
 .core-grid h2 { margin: 28px 0 10px; font-family: Georgia, serif; font-size: 26px; }
 .core-grid p { min-height: 52px; color: #93a1b7; line-height: 1.5; }
 .core-grid span { color: #6de0a7; font-size: 12px; font-weight: 750; }
+.core-grid .status-error { color: #ff8f85; }
 .secondary { margin-left: auto; padding: 12px 20px; color: #e4e9f5; border: 1px solid #485773; border-radius: 7px; background: transparent; cursor: pointer; }
 .secondary:hover { border-color: #d8a64f; color: #f1c777; }
 @media (max-width: 960px) { body { min-width: 0; } .app-shell { width: min(100% - 32px, 700px); } .provider-grid, .configuration-panel, .core-grid { grid-template-columns: 1fr; } .security-note { grid-column: auto; } h1 { font-size: 48px; } }

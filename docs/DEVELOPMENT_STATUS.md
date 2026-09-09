@@ -4,11 +4,11 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 
 ## Current phase
 
-Checkpoints 1 through 5 and Checkpoint 6A are complete. The Core MVP now has a runnable provider-neutral desktop foundation.
+Checkpoints 1 through 5 and Checkpoints 6A through 6B are complete. The desktop can read and render real deterministic-core health without an AI provider.
 
 ## Current checkpoint
 
-Checkpoint 6A — provider-neutral desktop foundation (complete); Checkpoint 6B — deterministic core bridge (next)
+Checkpoint 6B — read-only deterministic core status bridge (complete); Checkpoint 6C — deterministic intent/retrieval UI (next)
 
 ## Completed work
 
@@ -45,11 +45,14 @@ Checkpoint 6A — provider-neutral desktop foundation (complete); Checkpoint 6B 
 - Added a React/TypeScript/Vite/Tauri desktop shell with first-run choices for no AI, Ollama, and cloud configuration.
 - Added versioned non-secret provider state, safe invalid-state fallback, quality modes, and a no-AI local-core dashboard.
 - Added a minimal Tauri capability boundary with no filesystem, shell, or credential permission and generated the application icon set.
+- Added a fixed `core_status` Tauri command that invokes only Python validation, rejects failed/partial output, and returns typed summary counts.
+- Rendered real Snipe, bow-base, passive-node, provenance, and validation counts on the no-AI dashboard.
 
 ## Tests
 
 - Passing: forty-two unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
 - Passing: five provider-configuration tests, strict TypeScript/Vite production build, Rust `cargo check`, and Tauri release compilation without bundling.
+- Passing: two Rust bridge tests, including a real Python/SQLite validation call and failed-validation rejection.
 - Passing: all 15 data validation queries, SQLite integrity check, and foreign-key check.
 - Passing: class mapping, real projectile route, point cost, virtual-root exclusion, wrong-ascendancy rejection, enabled-ascendancy route, and missing-node rejection.
 - Passing: retrieval bounds, provenance/reasons, expected Snipe mechanics/supports, unique-data honesty, deterministic output, word-boundary matching, and unknown-skill rejection.
@@ -92,4 +95,4 @@ None for the next bounded implementation phase.
 
 ## Next task
 
-Expose a narrow read-only deterministic-core command through Tauri and render its real result without adding AI calls or the complete build workflow.
+Add a bounded Snipe build-intent form and candidate-retrieval bridge without invoking AI.

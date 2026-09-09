@@ -49,15 +49,18 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 - Checkpoint 6A adds a runnable React 19, TypeScript 7, Vite 8, and Tauri 2 desktop shell with provider-neutral first-run configuration.
 - Users can continue with no AI, choose local Ollama, or prepare a cloud endpoint/model; ordinary configuration stores no credential.
 - Five provider-state tests, the frontend production build, Rust `cargo check`, and native release compilation pass.
+- Checkpoint 6B adds one fixed, read-only Tauri `core_status` command that invokes Python validation and returns typed aggregate counts.
+- The no-AI dashboard renders real local counts: 15/15 checks, 1 Snipe skill, 5,153 passive nodes, 35 released bow bases, and 7 provenance files.
+- Two Rust bridge tests pass, including a real Python/SQLite invocation and failed-validation rejection.
 
 ## Current phase
 
-Checkpoint 6A — provider-neutral desktop foundation is complete. Checkpoint 6B — deterministic core bridge is next.
+Checkpoint 6B — read-only deterministic core status bridge is complete. Checkpoint 6C — deterministic build-intent and retrieval UI is next.
 
 ## Next exact action
 
-Expose a narrow read-only deterministic-core command through Tauri and render its real result in the desktop shell without adding the complete build workflow.
+Add the first Snipe build-intent form and expose bounded candidate retrieval through another narrow typed bridge command, without invoking AI.
 
 ## Completion rule for the next phase
 
-Keep the bridge read-only and narrow. Do not add AI calls, credential storage, or the complete build workflow in the same phase.
+Validate inputs in both Rust and Python-facing boundaries, keep retrieval bounded, and do not add AI calls or the complete workflow in the same phase.

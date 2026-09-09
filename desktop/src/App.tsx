@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { CoreStatus, readCoreStatus } from "./coreStatus";
 import {
   DEFAULT_PROVIDER_CONFIG,
   PROVIDER_CONFIG_KEY,
@@ -30,7 +31,23 @@ function initialConfig(): ProviderConfig {
 export default function App() {
   const [config, setConfig] = useState(initialConfig);
   const [saved, setSaved] = useState(false);
+  const [core, setCore] = useState<CoreStatus | null>(null);
+  const [coreError, setCoreError] = useState("");
   const errors = useMemo(() => validateProviderConfig(config), [config]);
+
+  useEffect(() => {
+    if (!config.onboardingComplete) return;
+    setCore(null);
+    setCoreError("");
+    readCoreStatus()
+      .then((status) => {
+        setCore(status);
+        setCoreError("");
+      })
+      .catch((error: unknown) => {
+        setCoreError(error instanceof Error ? error.message : String(error));
+      });
+  }, [config.onboardingComplete]);
 
   const selectProvider = (provider: ProviderKind) => {
     setConfig((current) => configForProvider(provider, current));
@@ -60,9 +77,9 @@ export default function App() {
           <p className="lede">{providerLabel}. Deterministic tools remain available regardless of provider state.</p>
         </section>
         <section className="core-grid">
-          <article><small>DATA</small><h2>PoE2 Database</h2><p>Pinned real-data foundation. Desktop wiring arrives in the next bounded phase.</p><span>Available without AI</span></article>
-          <article><small>GRAPH</small><h2>Passive Paths</h2><p>Connected allocations stay owned by deterministic pathfinding.</p><span>Available without AI</span></article>
-          <article><small>RULES</small><h2>Build Validator</h2><p>AI output remains untrusted until it passes local validation.</p><span>Available without AI</span></article>
+          <article><small>DATA</small><h2>PoE2 Database</h2><p>{core ? `${core.snipeSkills} Snipe skill · ${core.bowBases} released bow bases` : "Reading the local data core…"}</p><span>{core ? `${core.provenanceFiles} pinned source files` : "Available without AI"}</span></article>
+          <article><small>GRAPH</small><h2>Passive Paths</h2><p>{core ? `${core.passiveNodes.toLocaleString()} passive nodes available to deterministic pathfinding.` : "Connected allocations stay owned by deterministic pathfinding."}</p><span>Available without AI</span></article>
+          <article><small>RULES</small><h2>Build Validator</h2><p>{core ? `${core.passedChecks} of ${core.validationChecks} real-data checks passed.` : coreError || "Validating the read-only core…"}</p><span className={coreError ? "status-error" : ""}>{coreError ? "Core check needs attention" : "Local source of truth"}</span></article>
         </section>
         <footer className="actions">
           <div><strong>Provider-neutral by design</strong><span>No provider can replace the local source of truth.</span></div>

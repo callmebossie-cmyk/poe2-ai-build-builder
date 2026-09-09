@@ -80,4 +80,7 @@
 - [x] Keep the desktop foundation accessible when no AI provider is configured.
 - [x] Add versioned non-secret provider configuration without hard-coding a required provider.
 - [x] Compile a runnable Tauri executable without creating an installer.
-- [ ] Checkpoint 6B — connect the deterministic Python core to the desktop boundary.
+- [x] Checkpoint 6B — connect a narrow read-only Python core status command to the desktop.
+- [x] Render real validation/database summary counts with no AI provider configured.
+- [x] Keep command names, arguments, paths, and database selection outside frontend control.
+- [ ] Checkpoint 6C — add the first deterministic Snipe build-intent and candidate-retrieval screen.

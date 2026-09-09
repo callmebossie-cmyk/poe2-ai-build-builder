@@ -27,3 +27,13 @@ Only non-secret provider metadata is stored in browser storage. The versioned co
 - Existing Python core: forty-two tests remain passing.
 
 The generated executable and build directories are ignored. Installer/bundling belongs to Checkpoint 7.
+
+## Checkpoint 6B deterministic core bridge
+
+The native shell exposes one narrow `core_status` command. It runs the fixed Python command `poe2_builder.cli validate`, parses its JSON, rejects partial/failed validation, and returns only typed aggregate counts to the frontend.
+
+- The frontend cannot supply a command, argument, working directory, or database path.
+- The bridge does not expose arbitrary shell execution and does not require a Tauri shell permission.
+- Python and the SQLite database remain the current source of truth; this phase does not duplicate game rules in Rust or TypeScript.
+- `POE2_BUILDER_ROOT` and `POE2_BUILDER_PYTHON` are explicit development/runtime overrides for locating the core. Packaging a sidecar belongs to a later distribution phase.
+- The dashboard invokes the bridge after onboarding, including when provider mode is `none`, and renders real Snipe, bow-base, passive-node, provenance, and validation counts.
