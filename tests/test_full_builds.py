@@ -159,3 +159,25 @@ class FullBuildContractTests(unittest.TestCase):
         self.assertTrue(_support_accepts_skill(payload, {"Attack", "Bow"}))
         self.assertFalse(_support_accepts_skill(payload, {"Spell"}))
         self.assertFalse(_support_accepts_skill(payload, {"Attack", "Triggered"}))
+
+    def test_unsupported_quantitative_narrative_claims_are_rejected(self) -> None:
+        resistance = deepcopy(self.response)
+        resistance["build"]["defense"] = "This setup has exactly 75% resistance."
+        with self.assertRaisesRegex(FullBuildValidationError, "unsupported quantitative"):
+            validate_full_build(resistance, self.context, self.database)
+
+        dps = deepcopy(self.response)
+        dps["build"]["rotation"] = "This rotation guarantees top DPS."
+        with self.assertRaisesRegex(FullBuildValidationError, "unsupported quantitative"):
+            validate_full_build(dps, self.context, self.database)
+
+        price = deepcopy(self.response)
+        price["build"]["resource_solution"] = "Buy the solution for one Divine."
+        with self.assertRaisesRegex(FullBuildValidationError, "unsupported quantitative"):
+            validate_full_build(price, self.context, self.database)
+
+    def test_service_labels_narrative_and_resource_claims_as_advisory(self) -> None:
+        result = FullBuildService(self.database, OfflineFullBuildProvider()).generate(SELECTED_DIRECTION)
+        self.assertEqual(result["claim_boundaries"]["resource_status"], "advisory_not_calculated")
+        self.assertEqual(result["claim_boundaries"]["exact_dps_status"], "not_calculated")
+        self.assertIn("defense", result["claim_boundaries"]["advisory_only"])

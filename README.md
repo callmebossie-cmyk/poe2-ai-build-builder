@@ -4,7 +4,7 @@ Desktop build-planning tool for Path of Exile 2. The application will combine re
 
 ## Current status
 
-Checkpoints 1 through 4 and the first two Checkpoint 5 slices are complete: real-data import, passive graph, candidate retrieval, live AI build directions, deterministic Full Build validation, and a validated live local-Ollama Full Build route. Downloaded data, generated databases, and live AI evidence are ignored by Git.
+Checkpoints 1 through 5 are complete: real-data import, passive graph, candidate retrieval, live AI build directions, a live Full Build, and deterministic bounded validation. The Core MVP labels uncalculated qualitative/resource claims as advisory. Checkpoint 6 will add a provider-neutral desktop application with first-run provider selection. Downloaded data, generated databases, and live AI evidence are ignored by Git.
 
 ## Data proof of concept
 

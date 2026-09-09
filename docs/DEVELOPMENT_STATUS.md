@@ -4,11 +4,11 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 
 ## Current phase
 
-Checkpoints 1 through 4 and Checkpoints 5A through 5D are complete. Unsupported qualitative/resource claim handling remains before Checkpoint 5 can close.
+Checkpoints 1 through 5 are complete. The Core MVP can retrieve candidates, generate live directions and a Full Build, and validate the supported structural/rule boundary.
 
 ## Current checkpoint
 
-Checkpoint 5D — bounded gem-rule and character-base validation (complete); unsupported claim/resource boundary is next
+Checkpoint 5 — Full Build and Validator (complete); Checkpoint 6A — provider-neutral desktop foundation (next)
 
 ## Completed work
 
@@ -40,10 +40,12 @@ Checkpoint 5D — bounded gem-rule and character-base validation (complete); uns
 - Added deterministic rejection for duplicate supports/mods, case-insensitive duplicate equipment slots, shared exclusive mod groups, and prefix/suffix counts above three.
 - Added rule-level support validation using pinned allowed/excluded skill types and rejected stated attributes below the selected class base values.
 - Revalidated the preserved live Full Build against the Checkpoint 5C and 5D rules without an AI revision.
+- Added an explicit advisory boundary for qualitative/resource fields and rejected unsupported numeric DPS, percentage, and price/currency claims.
+- Revalidated the preserved live Full Build against the final Checkpoint 5 contract and marked the Core MVP complete.
 
 ## Tests
 
-- Passing: forty unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
+- Passing: forty-two unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
 - Passing: all 15 data validation queries, SQLite integrity check, and foreign-key check.
 - Passing: class mapping, real projectile route, point cost, virtual-root exclusion, wrong-ascendancy rejection, enabled-ascendancy route, and missing-node rejection.
 - Passing: retrieval bounds, provenance/reasons, expected Snipe mechanics/supports, unique-data honesty, deterministic output, word-boundary matching, and unknown-skill rejection.
@@ -86,4 +88,4 @@ None for the next bounded implementation phase.
 
 ## Next task
 
-Define a bounded, honest contract for unsupported qualitative and resource claims, then validate or explicitly label them without pretending to have a full calculator.
+Define the provider-neutral first-run configuration contract and the smallest desktop application shell while keeping deterministic features available without AI.

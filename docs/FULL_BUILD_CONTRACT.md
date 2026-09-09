@@ -31,4 +31,6 @@ On 2026-09-09, local `qwen3:8b` generated a level-65 Ranger/Ranger1 Snipe full b
 
 ## Remaining Checkpoint 5 boundary
 
-The offline provider remains a contract fixture, not an AI recommendation. The live full-build slice now passes, but Checkpoint 5 remains open for the remaining basic conflict rules. Exact DPS, complete gem-rule compatibility, computed passive attributes, and deeper conflict detection must not be claimed as validated.
+The offline provider remains a contract fixture, not an AI recommendation. Narrative fields are labeled advisory and resource, exact DPS, and price calculations are explicitly `not_calculated`. Numeric DPS, percentage, and currency/price claims in narrative fields are rejected until a deterministic calculator can support them.
+
+The preserved live Full Build passes the complete bounded validator, so Checkpoint 5 and the Core MVP are complete. Full PoB-grade DPS, reservation/resource simulation, computed passive attributes, and deeper mechanics remain later expansion work and must not be presented as validated.

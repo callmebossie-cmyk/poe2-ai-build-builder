@@ -71,5 +71,11 @@
 - [x] Reject shared exclusive mod groups and more than three prefixes or suffixes per item.
 - [x] Validate support allowed/excluded skill types from pinned rule metadata.
 - [x] Reject stated character attributes below the selected class base values.
-- [ ] Bound and validate unsupported qualitative/resource claims required to close Checkpoint 5.
-- [ ] Mark Checkpoint 5 complete only after the live full build passes.
+- [x] Bound unsupported quantitative claims and label qualitative/resource fields as advisory.
+- [x] Mark Checkpoint 5 complete after the preserved live full build passes the final validator.
+
+## Next — Checkpoint 6: Desktop Application
+
+- [ ] Checkpoint 6A — define provider-neutral first-run configuration and desktop shell boundary.
+- [ ] Keep deterministic features usable when no AI provider is configured.
+- [ ] Add provider configuration without hard-coding Ollama or any cloud model.

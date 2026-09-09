@@ -4,7 +4,7 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 
 ## Current state
 
-- Checkpoints 1 through 4 and Checkpoints 5A through 5B are complete.
+- Checkpoints 1 through 5 are complete; the deterministic/AI Core MVP exists.
 - A dependency-free Python data core downloads seven pinned real-data exports, verifies SHA-256 checksums, and builds `data/poe2.db` locally.
 - The generated database contains Snipe, its real tags/levels/stat sets, 15 source-recommended supports, the complete passive tree, ascendancies, item bases, mods, and per-file provenance.
 - Downloaded JSON and the generated database are excluded from Git.
@@ -43,16 +43,18 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 - Gem rule validation checks support `allowed_types` and `excluded_types` against the pinned active-skill types, beyond source recommendation alone.
 - Character validation rejects stated attributes below the selected class base values; provider minimums combine class and equipment requirements.
 - The preserved live Full Build passes the new gem-rule and character-base checks without revision.
-- Forty tests pass on Python 3.10 with resource warnings treated as errors; the pre-Ollama suite also passed on Python 3.14.
+- Narrative fields are explicitly advisory, resource/DPS/price calculation is labeled unavailable, and unsupported quantitative narrative claims are rejected.
+- The preserved live Full Build passes the final Checkpoint 5 validator without revision.
+- Forty-two tests pass on Python 3.10 with resource warnings treated as errors; the pre-Ollama suite also passed on Python 3.14.
 
 ## Current phase
 
-Checkpoint 5D — bounded gem-rule and character-base validation is complete. Unsupported qualitative/resource claims remain before closing Checkpoint 5.
+Checkpoint 5 — Full Build and Validator is complete. Checkpoint 6A — provider-neutral desktop foundation is next.
 
 ## Next exact action
 
-Define a bounded, honest contract for unsupported qualitative and resource claims, then validate or explicitly label them without pretending to have a full calculator.
+Define the provider-neutral first-run configuration contract and the smallest desktop application shell while keeping deterministic features available without AI.
 
 ## Completion rule for the next phase
 
-Do not mark Checkpoint 5 complete until one selected direction expands into a full build whose passive allocation, gems, equipment, character constraints, and unsupported claims are validated deterministically.
+Do not build the full UX at once. Complete and validate the provider/settings foundation before adding the build workflow screens.

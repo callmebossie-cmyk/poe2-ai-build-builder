@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
@@ -32,6 +33,10 @@ NARRATIVE_FIELDS = (
 
 LIST_TEXT_FIELDS = ("affix_priorities", "upgrade_order")
 
+UNSUPPORTED_QUANTITATIVE_CLAIM = re.compile(
+    r"(?:\d|%|\b(?:dps|damage per second|divine|chaos|exalted)\b)", re.IGNORECASE
+)
+
 
 def full_build_contract() -> dict[str, object]:
     return {
@@ -54,6 +59,10 @@ def full_build_contract() -> dict[str, object]:
             "upgrade_order": "non-empty list of strings",
             "rotation": "non-empty string",
         },
+        "claim_boundary": (
+            "narrative fields are advisory theorycraft; exact numeric DPS, percentages, "
+            "prices, and currency claims are forbidden until backed by a calculator"
+        ),
     }
 
 
@@ -200,6 +209,20 @@ class FullBuildService:
                 "equipment_requirements_valid": True,
                 "character_requirements_valid": True,
                 "basic_conflicts_valid": True,
+                "unsupported_quantitative_claims_absent": True,
+            },
+            "claim_boundaries": {
+                "deterministically_validated": [
+                    "entity references",
+                    "passive connectivity",
+                    "support type compatibility",
+                    "equipment spawn, level, attribute, affix-count, and mod-group rules",
+                    "class base attributes",
+                ],
+                "advisory_only": list(NARRATIVE_FIELDS) + list(LIST_TEXT_FIELDS),
+                "resource_status": "advisory_not_calculated",
+                "exact_dps_status": "not_calculated",
+                "price_status": "not_calculated",
             },
             "request_bytes": len(json.dumps(request, ensure_ascii=False, separators=(",", ":")).encode("utf-8")),
             "attempts": attempt,
@@ -245,6 +268,11 @@ def validate_full_build(
         raise FullBuildValidationError("build must be an object")
     for field in ("build_id", "title", *NARRATIVE_FIELDS):
         _non_empty_text(build.get(field), f"build.{field}")
+    for field in NARRATIVE_FIELDS:
+        if UNSUPPORTED_QUANTITATIVE_CLAIM.search(build[field]):
+            raise FullBuildValidationError(
+                f"build.{field} contains an unsupported quantitative DPS, percentage, or price claim"
+            )
     for field in LIST_TEXT_FIELDS:
         values = build.get(field)
         if not isinstance(values, list) or not values or not all(isinstance(x, str) and x.strip() for x in values):
