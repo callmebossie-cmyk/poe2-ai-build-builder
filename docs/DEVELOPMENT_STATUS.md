@@ -4,11 +4,11 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 
 ## Current phase
 
-Checkpoints 1 and 2 are complete. Checkpoint 3 is next.
+Checkpoints 1 through 3 are complete. Checkpoint 4 is next.
 
 ## Current checkpoint
 
-Checkpoint 3 — Candidate Retrieval (pending)
+Checkpoint 4 — AI Build Directions (pending)
 
 ## Completed work
 
@@ -21,12 +21,17 @@ Checkpoint 3 — Candidate Retrieval (pending)
 - Added normalized character-class/start mappings derived from source `classStartIndex` metadata.
 - Added undirected passive traversal with virtual-root exclusion, opt-in ascendancy islands, connectivity inspection, shortest paths, and allocation point costs.
 - Documented traversal rules and verified examples in `docs/PASSIVE_GRAPH.md`.
+- Added a structured `BuildIntent` and deterministic candidate retriever for mechanics, supports, passives, ascendancies, bases, mods, and uniques.
+- Added explainable scores, real graph-distance costs, provenance, bounded result counts, and serialized-size diagnostics.
+- Imported all 449 unique source rows without collapsing repeated canonical IDs; unique effect gaps are explicit.
+- Documented retrieval rules and current assumptions in `docs/CANDIDATE_RETRIEVAL.md`.
 
 ## Tests
 
-- Passing: ten unit/integration tests on Python 3.10 and Python 3.14 with `ResourceWarning` promoted to an error.
-- Passing: all 14 data validation queries, SQLite integrity check, and foreign-key check.
+- Passing: seventeen unit/integration tests on Python 3.10 and Python 3.14 with `ResourceWarning` promoted to an error.
+- Passing: all 15 data validation queries, SQLite integrity check, and foreign-key check.
 - Passing: class mapping, real projectile route, point cost, virtual-root exclusion, wrong-ascendancy rejection, enabled-ascendancy route, and missing-node rejection.
+- Passing: retrieval bounds, provenance/reasons, expected Snipe mechanics/supports, unique-data honesty, deterministic output, word-boundary matching, and unknown-skill rejection.
 - Failing: none.
 
 ## Known issues
@@ -34,6 +39,8 @@ Checkpoint 3 — Candidate Retrieval (pending)
 - Support compatibility currently means `recommended_by_source`; rule-level compatibility validation belongs to a later checkpoint.
 - The generated database is local and reproducible but is not packaged or redistributed.
 - The graph currently optimizes point count only; weighted build value belongs to candidate retrieval and later planning.
+- Candidate scores are deterministic heuristics for context selection, not claims of final build strength or exact DPS.
+- Unique effect data is absent from the selected RePoE export and remains unscored until a permitted, versioned source is integrated.
 
 ## Current blockers
 
@@ -57,7 +64,8 @@ None.
 - Raw source JSON and generated SQLite remain local artifacts ignored by Git; the repository stores downloader/importer code and pinned metadata.
 - Passive allocation treats source edges as undirected, excludes the virtual `root`, and opens only the explicitly selected ascendancy island.
 - Repository changes are accumulated locally and are pushed only when the user explicitly asks.
+- Candidate retrieval uses whole-word/phrase matches, source compatibility/release/spawn rules, passive point distance, and explicit bounded limits. The provider layer receives no raw database payloads.
 
 ## Next task
 
-Implement bounded, explainable candidate retrieval for `Snipe / Fast / Mapping / Cheap` without passing the full database to the AI layer.
+Implement Checkpoint 4's provider-neutral structured build-direction contract, offline test provider, schema validation, and invented-entity rejection over the compact BuildContext.

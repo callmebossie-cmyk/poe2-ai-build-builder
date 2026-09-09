@@ -29,6 +29,7 @@ def build_database(cache_dir: Path, database_path: Path) -> dict[str, int]:
     ascendancies = load_json(cache_dir, "ascendancies.json")
     item_bases = load_json(cache_dir, "base_items.json")
     mods = load_json(cache_dir, "mods.json")
+    uniques = load_json(cache_dir, "uniques.json")
 
     if SNIPE_GEM_ID not in skill_gems or SNIPE_SKILL_ID not in skills:
         raise ValueError("Pinned real-data sources do not contain the expected Snipe records")
@@ -50,6 +51,7 @@ def build_database(cache_dir: Path, database_path: Path) -> dict[str, int]:
         ascendancy_source = source_ids["ascendancies.json"]
         item_source = source_ids["base_items.json"]
         mod_source = source_ids["mods.json"]
+        unique_source = source_ids["uniques.json"]
 
         gem = skill_gems[SNIPE_GEM_ID]
         skill = skills[SNIPE_SKILL_ID]
@@ -76,9 +78,16 @@ def build_database(cache_dir: Path, database_path: Path) -> dict[str, int]:
             if support is None:
                 raise ValueError(f"Recommended support is missing from source: {support_id}")
             name = support.get("base_item", {}).get("display_name") or support.get("support_name") or support_id
+            support_payload = {
+                "gem": support,
+                "granted_skills": {
+                    skill_id: skills.get(skill_id)
+                    for skill_id in support.get("grants_skills", [])
+                },
+            }
             db.execute(
                 "INSERT INTO support_gems VALUES(?,?,?,?,?)",
-                (support_id, name, json_text(support.get("grants_skills", [])), json_text(support), gem_source),
+                (support_id, name, json_text(support.get("grants_skills", [])), json_text(support_payload), gem_source),
             )
             db.executemany(
                 "INSERT INTO support_tags VALUES(?,?,?)",
@@ -152,7 +161,7 @@ def build_database(cache_dir: Path, database_path: Path) -> dict[str, int]:
         for mod_id, mod in mods.items():
             db.execute(
                 "INSERT INTO mods VALUES(?,?,?,?,?,?,?,?)",
-                (mod_id, mod.get("name", mod_id), mod.get("domain"), mod.get("generation_type"), mod.get("required_level"), mod.get("text"), json_text(mod), mod_source),
+                (mod_id, mod.get("name") or mod_id, mod.get("domain"), mod.get("generation_type"), mod.get("required_level"), mod.get("text"), json_text(mod), mod_source),
             )
             db.executemany(
                 "INSERT INTO mod_stats VALUES(?,?,?,?,?,?)",
@@ -167,6 +176,21 @@ def build_database(cache_dir: Path, database_path: Path) -> dict[str, int]:
                 tag_rows.append((mod_id, generation["tag"], "generation", generation.get("weight"), mod_source))
             db.executemany("INSERT OR IGNORE INTO mod_tags VALUES(?,?,?,?,?)", tag_rows)
 
+        for unique_key, unique in uniques.items():
+            unique_id = unique.get("id") or unique_key
+            db.execute(
+                "INSERT INTO unique_items VALUES(?,?,?,?,?,?,?)",
+                (
+                    unique_key,
+                    unique_id,
+                    unique.get("name", unique_id),
+                    unique.get("item_class"),
+                    unique.get("base_version"),
+                    json_text(unique),
+                    unique_source,
+                ),
+            )
+
         db.execute("PRAGMA optimize")
 
     db.close()
@@ -179,6 +203,6 @@ def build_database(cache_dir: Path, database_path: Path) -> dict[str, int]:
             for table in (
                 "skills", "skill_tags", "skill_levels", "skill_stats", "support_gems",
                 "passive_nodes", "passive_edges", "character_classes", "class_starts", "ascendancies", "ascendancy_nodes",
-                "item_bases", "mods", "data_sources",
+                "item_bases", "mods", "unique_items", "data_sources",
             )
         }

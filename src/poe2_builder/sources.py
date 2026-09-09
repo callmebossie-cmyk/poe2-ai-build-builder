@@ -35,6 +35,7 @@ SOURCE_FILES = (
             "ascendancies.json",
             "base_items.json",
             "mods.json",
+            "uniques.json",
         )
     ),
 )

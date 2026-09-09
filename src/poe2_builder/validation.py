@@ -20,7 +20,8 @@ CHECKS = {
     "Ascendancy nodes available": ("SELECT COUNT(*) FROM ascendancy_nodes", 1),
     "Bow bases queryable": ("SELECT COUNT(*) FROM item_bases WHERE item_class='Bow' AND release_state='released'", 1),
     "Bow mods queryable": ("SELECT COUNT(DISTINCT mod_id) FROM mod_tags WHERE tag='bow' AND kind='spawn' AND weight>0", 1),
-    "Data provenance recorded": ("SELECT COUNT(*) FROM data_sources WHERE length(sha256)=64 AND length(version)>0", 6),
+    "Bow uniques queryable": ("SELECT COUNT(*) FROM unique_items WHERE item_class='Bow'", 1),
+    "Data provenance recorded": ("SELECT COUNT(*) FROM data_sources WHERE length(sha256)=64 AND length(version)>0", 7),
 }
 
 
@@ -53,5 +54,6 @@ def snipe_summary(path: Path) -> dict[str, object]:
         skill["class_starts"] = [dict(row) for row in db.execute("SELECT class_name,node_id FROM class_starts ORDER BY class_name")]
         skill["bow_bases"] = [dict(row) for row in db.execute("SELECT id,name,drop_level FROM item_bases WHERE item_class='Bow' AND release_state='released' ORDER BY drop_level,name LIMIT 10")]
         skill["bow_mods"] = [dict(row) for row in db.execute("SELECT DISTINCT m.id,m.name,m.text FROM mods m JOIN mod_tags t ON t.mod_id=m.id WHERE t.tag='bow' AND t.kind='spawn' AND t.weight>0 ORDER BY m.required_level,m.name LIMIT 10")]
+        skill["bow_uniques"] = [dict(row) for row in db.execute("SELECT id,name FROM unique_items WHERE item_class='Bow' ORDER BY name")]
         skill["sources"] = [dict(row) for row in db.execute("SELECT name,version,file_name,sha256 FROM data_sources ORDER BY file_name")]
         return skill

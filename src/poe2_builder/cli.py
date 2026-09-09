@@ -8,6 +8,7 @@ from .fetch import fetch_sources
 from .database import connect
 from .graph import PassiveGraph, PathNotFoundError
 from .importer import build_database
+from .retrieval import BuildIntent, CandidateRetriever
 from .validation import snipe_summary, validate_database
 
 
@@ -23,6 +24,11 @@ def parser() -> argparse.ArgumentParser:
     commands.add_parser("snipe", help="show queryable Snipe vertical-slice data")
     graph = commands.add_parser("graph-demo", help="find the nearest projectile passive from a class start")
     graph.add_argument("--class-name", default="Ranger")
+    retrieve = commands.add_parser("retrieve", help="build a bounded, explainable candidate context")
+    retrieve.add_argument("--skill", default="Snipe")
+    retrieve.add_argument("--playstyle", default="Fast")
+    retrieve.add_argument("--goal", default="Mapping")
+    retrieve.add_argument("--budget", default="Cheap")
     commands.add_parser("all", help="fetch, build, validate, and show Snipe data")
     return result
 
@@ -74,6 +80,9 @@ def main() -> None:
                 "connected_component_size": passive_graph.component_size(start),
             }
         )
+    if args.command == "retrieve":
+        intent = BuildIntent(args.skill, args.playstyle, args.goal, args.budget)
+        print_json(CandidateRetriever(args.database).retrieve(intent))
 
 
 if __name__ == "__main__":

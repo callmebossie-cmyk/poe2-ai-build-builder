@@ -28,7 +28,7 @@ class RealDataCheckpointTests(unittest.TestCase):
         self.assertGreater(len(summary["projectile_passives"]), 0)
         self.assertGreater(len(summary["bow_bases"]), 0)
         self.assertGreater(len(summary["bow_mods"]), 0)
-        self.assertEqual(len(summary["sources"]), 6)
+        self.assertEqual(len(summary["sources"]), 7)
 
     def test_real_tree_maps_all_character_classes_to_start_nodes(self) -> None:
         graph = PassiveGraph.from_database(self.database)

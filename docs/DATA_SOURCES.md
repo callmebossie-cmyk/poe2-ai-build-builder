@@ -7,7 +7,7 @@ Checked on 2026-09-09.
 | Data | Repository | Pinned revision | Local file |
 | --- | --- | --- | --- |
 | Passive tree | `grindinggear/poe2-skilltree-export` | `bd87e6512c92b868542eddfb1ba4ea8b6dc2da36` | `passive_tree.json` |
-| Skills, gems, ascendancies, bases, mods | `repoe-fork/poe2` | `5428e93202bedda0af43f79723c7dba586733f41` | five JSON exports |
+| Skills, gems, ascendancies, bases, mods, uniques | `repoe-fork/poe2` | `5428e93202bedda0af43f79723c7dba586733f41` | six JSON exports |
 
 The RePoE export reports game/export version `4.5.5.1.6` at this revision.
 

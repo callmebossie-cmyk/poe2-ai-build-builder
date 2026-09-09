@@ -17,6 +17,7 @@ python -m poe2_builder.cli build
 python -m poe2_builder.cli validate
 python -m poe2_builder.cli snipe
 python -m poe2_builder.cli graph-demo --class-name Ranger
+python -m poe2_builder.cli retrieve --skill Snipe --playstyle Fast --goal Mapping --budget Cheap
 ```
 
 Run the unit tests with:
@@ -37,4 +38,4 @@ Read these files before continuing:
 
 ## Working rule
 
-Work one checkpoint at a time. Use real sourced data, record provenance and versions, run the relevant tests, update the state documents, then commit and push.
+Work one checkpoint at a time. Use real sourced data, record provenance and versions, run the relevant tests, update the state documents, and create a local commit. Push only when the user explicitly asks.

@@ -160,12 +160,22 @@ CREATE TABLE mod_tags (
     source_id INTEGER NOT NULL REFERENCES data_sources(id),
     PRIMARY KEY (mod_id, tag, kind)
 );
+CREATE TABLE unique_items (
+    id TEXT PRIMARY KEY,
+    canonical_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    item_class TEXT,
+    base_version TEXT,
+    payload_json TEXT NOT NULL,
+    source_id INTEGER NOT NULL REFERENCES data_sources(id)
+);
 CREATE INDEX idx_skill_name ON skills(name);
 CREATE INDEX idx_passive_name ON passive_nodes(name);
 CREATE INDEX idx_passive_stats_text ON passive_stats(text);
 CREATE INDEX idx_item_class ON item_bases(item_class);
 CREATE INDEX idx_mod_text ON mods(text);
 CREATE INDEX idx_mod_tags_tag ON mod_tags(tag);
+CREATE INDEX idx_unique_item_class ON unique_items(item_class);
 """
 
 
