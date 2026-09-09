@@ -16,6 +16,7 @@ python -m poe2_builder.cli fetch
 python -m poe2_builder.cli build
 python -m poe2_builder.cli validate
 python -m poe2_builder.cli snipe
+python -m poe2_builder.cli graph-demo --class-name Ranger
 ```
 
 Run the unit tests with:

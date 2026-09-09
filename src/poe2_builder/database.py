@@ -77,6 +77,20 @@ CREATE TABLE passive_nodes (
     payload_json TEXT NOT NULL,
     source_id INTEGER NOT NULL REFERENCES data_sources(id)
 );
+CREATE TABLE character_classes (
+    class_index INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    base_strength INTEGER NOT NULL,
+    base_dexterity INTEGER NOT NULL,
+    base_intelligence INTEGER NOT NULL,
+    payload_json TEXT NOT NULL,
+    source_id INTEGER NOT NULL REFERENCES data_sources(id)
+);
+CREATE TABLE class_starts (
+    class_name TEXT PRIMARY KEY REFERENCES character_classes(name),
+    node_id TEXT NOT NULL REFERENCES passive_nodes(id),
+    source_id INTEGER NOT NULL REFERENCES data_sources(id)
+);
 CREATE TABLE passive_edges (
     from_node TEXT NOT NULL,
     to_node TEXT NOT NULL,

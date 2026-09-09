@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 
 from .fetch import fetch_sources
+from .database import connect
+from .graph import PassiveGraph, PathNotFoundError
 from .importer import build_database
 from .validation import snipe_summary, validate_database
 
@@ -19,6 +21,8 @@ def parser() -> argparse.ArgumentParser:
     commands.add_parser("build", help="build SQLite from verified source files")
     commands.add_parser("validate", help="validate Checkpoint 1 acceptance criteria")
     commands.add_parser("snipe", help="show queryable Snipe vertical-slice data")
+    graph = commands.add_parser("graph-demo", help="find the nearest projectile passive from a class start")
+    graph.add_argument("--class-name", default="Ranger")
     commands.add_parser("all", help="fetch, build, validate, and show Snipe data")
     return result
 
@@ -37,6 +41,39 @@ def main() -> None:
         print_json(validate_database(args.database))
     if args.command in {"snipe", "all"}:
         print_json(snipe_summary(args.database))
+    if args.command == "graph-demo":
+        passive_graph = PassiveGraph.from_database(args.database)
+        start = passive_graph.class_start(args.class_name)
+        db = connect(args.database)
+        try:
+            targets = [
+                row[0]
+                for row in db.execute(
+                    "SELECT DISTINCT node_id FROM passive_stats WHERE lower(text) LIKE '%projectile%'"
+                )
+            ]
+        finally:
+            db.close()
+        paths = []
+        for target in targets:
+            try:
+                paths.append(passive_graph.shortest_path(start, target))
+            except PathNotFoundError:
+                continue
+        if not paths:
+            raise PathNotFoundError(f"No reachable projectile passive from {args.class_name}")
+        path = min(paths, key=lambda candidate: (candidate.point_cost, candidate.nodes[-1]))
+        print_json(
+            {
+                "class": args.class_name,
+                "start": start,
+                "target": path.nodes[-1],
+                "target_name": passive_graph.names[path.nodes[-1]],
+                "point_cost": path.point_cost,
+                "nodes": path.nodes,
+                "connected_component_size": passive_graph.component_size(start),
+            }
+        )
 
 
 if __name__ == "__main__":

@@ -103,6 +103,26 @@ def build_database(cache_dir: Path, database_path: Path) -> dict[str, int]:
                     "INSERT INTO ascendancy_nodes VALUES(?,?,?)",
                     (node["ascendancyId"], str(node_id), tree_source),
                 )
+        for class_index, character_class in enumerate(passive_tree.get("classes", [])):
+            db.execute(
+                "INSERT INTO character_classes VALUES(?,?,?,?,?,?,?)",
+                (
+                    class_index,
+                    character_class["name"],
+                    character_class.get("base_str", 0),
+                    character_class.get("base_dex", 0),
+                    character_class.get("base_int", 0),
+                    json_text(character_class),
+                    tree_source,
+                ),
+            )
+        for node_id, node in passive_tree["nodes"].items():
+            for class_index in node.get("classStartIndex", []):
+                character_class = passive_tree["classes"][class_index]
+                db.execute(
+                    "INSERT INTO class_starts VALUES(?,?,?)",
+                    (character_class["name"], str(node_id), tree_source),
+                )
         db.executemany(
             "INSERT OR IGNORE INTO passive_edges VALUES(?,?,?)",
             ((str(edge["from"]), str(edge["to"]), tree_source) for edge in passive_tree["edges"]),
@@ -158,7 +178,7 @@ def build_database(cache_dir: Path, database_path: Path) -> dict[str, int]:
             table: db.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
             for table in (
                 "skills", "skill_tags", "skill_levels", "skill_stats", "support_gems",
-                "passive_nodes", "passive_edges", "ascendancies", "ascendancy_nodes",
+                "passive_nodes", "passive_edges", "character_classes", "class_starts", "ascendancies", "ascendancy_nodes",
                 "item_bases", "mods", "data_sources",
             )
         }

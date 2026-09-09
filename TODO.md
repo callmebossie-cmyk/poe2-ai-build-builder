@@ -12,19 +12,30 @@
 - [x] Verify every Checkpoint 1 acceptance criterion.
 - [x] Update checkpoint and development documents.
 
-## Next — Checkpoint 2: Passive Graph
+## Completed — Checkpoint 2: Passive Graph
 
-- [ ] Load passive nodes and edges from SQLite.
-- [ ] Identify class start nodes from real metadata.
-- [ ] Check graph connectivity.
-- [ ] Calculate a valid shortest path and point cost.
-- [ ] Reject missing and impossible paths with explicit errors.
-- [ ] Add meaningful graph tests over the real imported tree.
-- [ ] Update status documents, commit, and push the bounded phase.
+- [x] Load passive nodes and edges from SQLite.
+- [x] Identify class start nodes from real metadata.
+- [x] Check graph connectivity without the virtual-root shortcut.
+- [x] Calculate a valid shortest path and point cost.
+- [x] Reject missing and impossible paths with explicit errors.
+- [x] Add meaningful graph tests over the real imported tree.
+- [x] Update status documents and create a local checkpoint commit.
+
+## Next — Checkpoint 3: Candidate Retrieval
+
+- [ ] Define the structured build-intent input.
+- [ ] Retrieve compact Snipe mechanics and related support candidates.
+- [ ] Rank relevant passives and ascendancies with reasons.
+- [ ] Rank relevant bow bases, mods, and available uniques with reasons.
+- [ ] Include source IDs and scoring metadata for debugging.
+- [ ] Prove the result is bounded and does not contain the full database.
+- [ ] Add real-data retrieval tests.
+- [ ] Update status documents and create a local checkpoint commit without pushing.
 
 ## Later checkpoints
 
-- [ ] Checkpoint 2 — Passive Graph (next)
+- [x] Checkpoint 2 — Passive Graph
 - [ ] Checkpoint 3 — Candidate Retrieval
 - [ ] Checkpoint 4 — AI Build Directions
 - [ ] Checkpoint 5 — Full Build and Validator

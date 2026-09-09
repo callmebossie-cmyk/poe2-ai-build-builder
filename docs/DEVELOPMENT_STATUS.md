@@ -4,11 +4,11 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 
 ## Current phase
 
-Checkpoint 1 is complete. Checkpoint 2 is next.
+Checkpoints 1 and 2 are complete. Checkpoint 3 is next.
 
 ## Current checkpoint
 
-Checkpoint 2 — Passive Graph (pending)
+Checkpoint 3 — Candidate Retrieval (pending)
 
 ## Completed work
 
@@ -18,17 +18,22 @@ Checkpoint 2 — Passive Graph (pending)
 - Added pinned fetch, checksum manifest, normalized SQLite import, validation, and query commands using only the Python standard library.
 - Imported and validated the real Snipe slice plus the full passive tree, ascendancies, item bases, and mods.
 - Documented source provenance, licensing findings, and the no-redistribution boundary in `docs/DATA_SOURCES.md`.
+- Added normalized character-class/start mappings derived from source `classStartIndex` metadata.
+- Added undirected passive traversal with virtual-root exclusion, opt-in ascendancy islands, connectivity inspection, shortest paths, and allocation point costs.
+- Documented traversal rules and verified examples in `docs/PASSIVE_GRAPH.md`.
 
 ## Tests
 
-- Passing: five unit/integration tests on Python 3.10 and Python 3.14.
-- Passing: all 13 Checkpoint 1 validation queries, SQLite integrity check, and foreign-key check.
+- Passing: ten unit/integration tests on Python 3.10 and Python 3.14 with `ResourceWarning` promoted to an error.
+- Passing: all 14 data validation queries, SQLite integrity check, and foreign-key check.
+- Passing: class mapping, real projectile route, point cost, virtual-root exclusion, wrong-ascendancy rejection, enabled-ascendancy route, and missing-node rejection.
 - Failing: none.
 
 ## Known issues
 
 - Support compatibility currently means `recommended_by_source`; rule-level compatibility validation belongs to a later checkpoint.
 - The generated database is local and reproducible but is not packaged or redistributed.
+- The graph currently optimizes point count only; weighted build value belongs to candidate retrieval and later planning.
 
 ## Current blockers
 
@@ -50,7 +55,9 @@ None.
 - No checkpoint may pass using hand-written mock data, hard-coded output, or unvalidated stubs.
 - Checkpoint 1 uses Python 3.10+ and the standard-library `sqlite3` module so data inspection and importer iteration stay dependency-free. The final desktop direction remains React, TypeScript, Tauri, and a Rust core unless later evidence warrants a documented change.
 - Raw source JSON and generated SQLite remain local artifacts ignored by Git; the repository stores downloader/importer code and pinned metadata.
+- Passive allocation treats source edges as undirected, excludes the virtual `root`, and opens only the explicitly selected ascendancy island.
+- Repository changes are accumulated locally and are pushed only when the user explicitly asks.
 
 ## Next task
 
-Implement Checkpoint 2 graph loading, class-start discovery, connectivity, shortest-path point cost, impossible-path rejection, and real-tree tests.
+Implement bounded, explainable candidate retrieval for `Snipe / Fast / Mapping / Cheap` without passing the full database to the AI layer.

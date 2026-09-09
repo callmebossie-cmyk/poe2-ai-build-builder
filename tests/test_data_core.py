@@ -4,6 +4,7 @@ import json
 import sqlite3
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 
 from poe2_builder.fetch import sha256_file
@@ -26,7 +27,7 @@ class DataCoreTests(unittest.TestCase):
             self.assertNotIn(";", query)
 
     def test_json1_is_not_required(self) -> None:
-        with sqlite3.connect(":memory:") as db:
+        with closing(sqlite3.connect(":memory:")) as db:
             db.execute("CREATE TABLE records(payload_json TEXT NOT NULL)")
             payload = json.dumps({"name": "Snipe"})
             db.execute("INSERT INTO records VALUES(?)", (payload,))
