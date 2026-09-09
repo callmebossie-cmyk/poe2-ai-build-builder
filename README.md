@@ -19,6 +19,7 @@ python -m poe2_builder.cli snipe
 python -m poe2_builder.cli graph-demo --class-name Ranger
 python -m poe2_builder.cli retrieve --skill Snipe --playstyle Fast --goal Mapping --budget Cheap
 python -m poe2_builder.cli directions-contract-demo
+python -m poe2_builder.cli directions-ollama --model qwen3:8b --output .cache/live-directions.json
 ```
 
 Run the unit tests with:

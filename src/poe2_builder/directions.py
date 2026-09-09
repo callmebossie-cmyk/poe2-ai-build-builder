@@ -87,6 +87,7 @@ def response_contract() -> dict[str, object]:
 class BuildDirectionService:
     database_path: Path
     provider: DirectionProvider
+    max_attempts: int = 1
 
     def generate(
         self,
@@ -107,13 +108,29 @@ class BuildDirectionService:
                 "Do not claim exact DPS or effects absent from candidate metadata.",
             ],
         }
-        raw = self.provider.generate(request)
-        try:
-            response = json.loads(raw)
-        except (json.JSONDecodeError, TypeError) as error:
-            raise DirectionValidationError(f"Provider returned invalid JSON: {error}") from error
-        directions = validate_direction_response(response, context)
-        return {
+        if self.max_attempts < 1:
+            raise ValueError("max_attempts must be at least one")
+        last_error = None
+        for attempt in range(1, self.max_attempts + 1):
+            raw = self.provider.generate(request)
+            try:
+                response = json.loads(raw)
+            except (json.JSONDecodeError, TypeError) as error:
+                last_error = DirectionValidationError(f"Provider returned invalid JSON: {error}")
+            else:
+                try:
+                    directions = validate_direction_response(response, context)
+                    break
+                except DirectionValidationError as error:
+                    last_error = error
+            if attempt < self.max_attempts:
+                request["validation_feedback"] = str(last_error)
+                request["instructions"].append(
+                    "The previous attempt failed validation. Regenerate the complete response and fix validation_feedback."
+                )
+        else:
+            raise last_error
+        result = {
             "schema_version": 1,
             "provider": {
                 "name": self.provider.name,
@@ -126,7 +143,12 @@ class BuildDirectionService:
             "directions": directions,
             "validation": {"schema_valid": True, "entity_references_valid": True},
             "request_bytes": len(json.dumps(request, ensure_ascii=False, separators=(",", ":")).encode("utf-8")),
+            "attempts": attempt,
         }
+        runtime_metadata = getattr(self.provider, "last_metadata", None)
+        if runtime_metadata:
+            result["provider"]["runtime"] = runtime_metadata
+        return result
 
 
 def validate_direction_response(

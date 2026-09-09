@@ -4,11 +4,11 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 
 ## Current phase
 
-Checkpoints 1 through 3 and Checkpoint 4A are complete. Checkpoint 4B awaits a live-provider choice.
+Checkpoints 1 through 4 are complete.
 
 ## Current checkpoint
 
-Checkpoint 4A — Provider contract and validation (complete); Checkpoint 4B — Live provider run (blocked)
+Checkpoint 4 — AI Build Directions (complete)
 
 ## Completed work
 
@@ -29,10 +29,13 @@ Checkpoint 4A — Provider contract and validation (complete); Checkpoint 4B —
 - Added a strict JSON response contract and validation for required content, types, ratings, entity references, class/ascendancy consistency, and material distinction.
 - Added an offline deterministic contract provider that is explicitly labeled as test-only output.
 - Documented the provider boundary and remaining live-provider work in `docs/BUILD_DIRECTION_CONTRACT.md`.
+- Added a local Ollama adapter with JSON-schema constrained output, runtime metadata, and bounded validation retries.
+- Ran `qwen3:8b` against the bounded Snipe context and validated three materially distinct live directions on the first attempt.
+- Preserved the live result at ignored local path `.cache/live-directions.json`; no credentials or generated recommendations are committed.
 
 ## Tests
 
-- Passing: twenty-five unit/integration tests on Python 3.10 and Python 3.14 with `ResourceWarning` promoted to an error.
+- Passing: twenty-nine unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
 - Passing: all 15 data validation queries, SQLite integrity check, and foreign-key check.
 - Passing: class mapping, real projectile route, point cost, virtual-root exclusion, wrong-ascendancy rejection, enabled-ascendancy route, and missing-node rejection.
 - Passing: retrieval bounds, provenance/reasons, expected Snipe mechanics/supports, unique-data honesty, deterministic output, word-boundary matching, and unknown-skill rejection.
@@ -46,11 +49,11 @@ Checkpoint 4A — Provider contract and validation (complete); Checkpoint 4B —
 - The graph currently optimizes point count only; weighted build value belongs to candidate retrieval and later planning.
 - Candidate scores are deterministic heuristics for context selection, not claims of final build strength or exact DPS.
 - Unique effect data is absent from the selected RePoE export and remains unscored until a permitted, versioned source is integrated.
-- No live AI provider has run. Offline contract examples are not build recommendations and do not complete Checkpoint 4.
+- The first live run is validated structurally and against candidate references, but its qualitative theorycrafting claims are not yet full-build or calculation-engine validated.
 
 ## Current blockers
 
-Live-provider selection requires user direction because cloud execution can incur API cost and local Ollama requires a model download. See `USER_ACTION_REQUIRED.md`.
+None for the next bounded implementation phase.
 
 ## Data versions
 
@@ -75,4 +78,4 @@ Live-provider selection requires user direction because cloud execution can incu
 
 ## Next task
 
-After the user selects a live provider/model and cost/resource route, implement its adapter and validate a live response through the existing Checkpoint 4A contract.
+Begin Checkpoint 5 with one bounded Full Build and Validator slice selected from a validated direction.

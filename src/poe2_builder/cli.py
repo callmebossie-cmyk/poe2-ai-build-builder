@@ -10,6 +10,7 @@ from .directions import BuildDirectionService, OfflineDeterministicProvider, Qua
 from .graph import PassiveGraph, PathNotFoundError
 from .importer import build_database
 from .retrieval import BuildIntent, CandidateRetriever
+from .ollama_provider import OllamaProvider
 from .validation import snipe_summary, validate_database
 
 
@@ -36,6 +37,15 @@ def parser() -> argparse.ArgumentParser:
     directions.add_argument("--goal", default="Mapping")
     directions.add_argument("--budget", default="Cheap")
     directions.add_argument("--quality", choices=[mode.value for mode in QualityMode], default=QualityMode.BALANCED.value)
+    ollama = commands.add_parser("directions-ollama", help="run live build directions through local Ollama")
+    ollama.add_argument("--model", default="qwen3:8b")
+    ollama.add_argument("--endpoint", default="http://127.0.0.1:11434/api/chat")
+    ollama.add_argument("--skill", default="Snipe")
+    ollama.add_argument("--playstyle", default="Fast")
+    ollama.add_argument("--goal", default="Mapping")
+    ollama.add_argument("--budget", default="Cheap")
+    ollama.add_argument("--quality", choices=[mode.value for mode in QualityMode], default=QualityMode.BALANCED.value)
+    ollama.add_argument("--output", type=Path)
     commands.add_parser("all", help="fetch, build, validate, and show Snipe data")
     return result
 
@@ -94,6 +104,18 @@ def main() -> None:
         intent = BuildIntent(args.skill, args.playstyle, args.goal, args.budget)
         service = BuildDirectionService(args.database, OfflineDeterministicProvider())
         print_json(service.generate(intent, QualityMode(args.quality)))
+    if args.command == "directions-ollama":
+        intent = BuildIntent(args.skill, args.playstyle, args.goal, args.budget)
+        service = BuildDirectionService(
+            args.database,
+            OllamaProvider(model=args.model, endpoint=args.endpoint),
+            max_attempts=3,
+        )
+        result = service.generate(intent, QualityMode(args.quality))
+        if args.output:
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print_json(result)
 
 
 if __name__ == "__main__":

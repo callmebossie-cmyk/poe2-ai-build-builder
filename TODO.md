@@ -43,16 +43,16 @@
 - [x] Add an explicitly labeled offline deterministic provider for tests.
 - [x] Add structured-output, duplicate-direction, and invented-entity tests.
 - [x] Complete Checkpoint 4A documentation and local commit without pushing.
-- [ ] User chooses live cloud provider/model and test budget, or local Ollama model/resource route.
-- [ ] Implement the selected live provider adapter without storing credentials.
-- [ ] Run and validate at least three live directions.
-- [ ] Complete Checkpoint 4B and mark Checkpoint 4 complete.
+- [x] User chooses live cloud provider/model and test budget, or local Ollama model/resource route.
+- [x] Implement the selected live provider adapter without storing credentials.
+- [x] Run and validate at least three live directions.
+- [x] Complete Checkpoint 4B and mark Checkpoint 4 complete.
 
 ## Later checkpoints
 
 - [x] Checkpoint 2 — Passive Graph
 - [x] Checkpoint 3 — Candidate Retrieval
-- [ ] Checkpoint 4 — AI Build Directions
+- [x] Checkpoint 4 — AI Build Directions
 - [ ] Checkpoint 5 — Full Build and Validator
 - [ ] Checkpoint 6 — Desktop Application
 - [ ] Checkpoint 7 — Windows Distribution

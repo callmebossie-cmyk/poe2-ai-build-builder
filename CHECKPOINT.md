@@ -4,11 +4,11 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 
 ## Current state
 
-- Checkpoints 1 through 3 and Checkpoint 4A are complete. Checkpoint 4B is waiting for a live-provider choice.
+- Checkpoints 1 through 4 are complete.
 - A dependency-free Python data core downloads seven pinned real-data exports, verifies SHA-256 checksums, and builds `data/poe2.db` locally.
 - The generated database contains Snipe, its real tags/levels/stat sets, 15 source-recommended supports, the complete passive tree, ascendancies, item bases, mods, and per-file provenance.
 - Downloaded JSON and the generated database are excluded from Git.
-- User action is required only for the live-provider route recorded in `USER_ACTION_REQUIRED.md`.
+- No user action is currently required.
 - Changes after commit `d62d287` are local only and have not been pushed, following the user's instruction.
 
 ## Completed acceptance evidence
@@ -32,16 +32,19 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 - Requests contain the bounded BuildContext and contract, with no database path, raw payload, or secret; verified below 50 KB.
 - Response validation rejects malformed/incomplete JSON, wrong skill, class/ascendancy mismatch, invented candidate IDs, duplicate identities/titles, and cosmetically renamed duplicate selections.
 - Offline output is labeled `test_only_not_ai_recommendation` and cannot be mistaken for a live recommendation.
-- Twenty-five tests pass on Python 3.10 and Python 3.14 with resource warnings treated as errors.
+- The local Ollama adapter constrains structured output to candidate IDs and retries validator failures with bounded feedback.
+- A live `qwen3:8b` run returned three materially distinct, schema-valid directions with valid entity references on its first attempt.
+- Live evidence is preserved locally at `.cache/live-directions.json` and excluded from Git; the bounded request was 27,293 bytes.
+- Twenty-nine tests pass on Python 3.10 with resource warnings treated as errors; the pre-Ollama suite also passed on Python 3.14.
 
 ## Current phase
 
-Checkpoint 4A — provider contract and validation is complete. Checkpoint 4B — live provider execution is blocked on provider/model choice.
+Checkpoint 4 — AI Build Directions is complete.
 
 ## Next exact action
 
-Read this file, `docs/DEVELOPMENT_STATUS.md`, and `USER_ACTION_REQUIRED.md`. After the user chooses a provider/model and acceptable cost/resource route, implement that adapter, run the bounded request, validate at least three live build directions, and preserve the validated response as local test evidence without committing secrets.
+Read this file, `docs/DEVELOPMENT_STATUS.md`, and the project plan. Begin Checkpoint 5 with one bounded Full Build and Validator slice, keeping AI output untrusted until deterministic validation passes.
 
 ## Completion rule for the next phase
 
-Do not mark Checkpoint 4 complete until a live provider receives only the bounded BuildContext, returns at least three schema-valid and materially distinct directions with every referenced entity present in the candidate context, and the live output passes the existing validator.
+Do not mark Checkpoint 5 complete until one selected direction expands into a full build whose passive allocation, gems, equipment, character constraints, and unsupported claims are validated deterministically.

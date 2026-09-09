@@ -34,4 +34,4 @@ Its direction text repeats that it is a contract example. It must never be shown
 
 ## Remaining work for Checkpoint 4
 
-A live provider adapter must pass the same contract and return at least three validated directions. That run may require the user to choose/configure a provider and supply credentials through a secure local mechanism. Until that happens, Checkpoint 4A is complete and Checkpoint 4 remains open.
+The local Ollama adapter passes the same contract. On 2026-09-09, `qwen3:8b` returned three validated, materially distinct directions on its first attempt using only the bounded BuildContext. The generated evidence remains local at `.cache/live-directions.json`; Checkpoint 4 is complete.

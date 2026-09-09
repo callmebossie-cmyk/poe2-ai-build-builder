@@ -24,6 +24,19 @@ class CapturingProvider(OfflineDeterministicProvider):
         return super().generate(request)
 
 
+class FailsOnceProvider(OfflineDeterministicProvider):
+    def __init__(self) -> None:
+        self.calls = 0
+        self.feedback = None
+
+    def generate(self, request: dict[str, object]) -> str:
+        self.calls += 1
+        if self.calls == 1:
+            return "not json"
+        self.feedback = request.get("validation_feedback")
+        return super().generate(request)
+
+
 class BuildDirectionContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -116,3 +129,18 @@ class BuildDirectionContractTests(unittest.TestCase):
             result = BuildDirectionService(self.database, provider).generate(self.intent, mode)
             self.assertEqual(provider.request["quality_mode"], mode.value)
             self.assertEqual(result["quality_mode"], mode.value)
+
+    def test_validation_failure_is_retried_with_bounded_feedback(self) -> None:
+        provider = FailsOnceProvider()
+        result = BuildDirectionService(
+            self.database, provider, max_attempts=2
+        ).generate(self.intent)
+        self.assertEqual(provider.calls, 2)
+        self.assertEqual(result["attempts"], 2)
+        self.assertIn("invalid JSON", provider.feedback)
+
+    def test_retry_count_must_be_positive(self) -> None:
+        with self.assertRaisesRegex(ValueError, "at least one"):
+            BuildDirectionService(
+                self.database, OfflineDeterministicProvider(), max_attempts=0
+            ).generate(self.intent)
