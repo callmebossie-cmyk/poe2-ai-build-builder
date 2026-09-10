@@ -25,7 +25,7 @@ export const DEFAULT_PROVIDER_CONFIG: ProviderConfig = {
 
 const providerDefaults: Record<ProviderKind, Pick<ProviderConfig, "endpoint" | "model">> = {
   none: { endpoint: "", model: "" },
-  ollama: { endpoint: "http://127.0.0.1:11434", model: "qwen3:8b" },
+  ollama: { endpoint: "http://127.0.0.1:11434", model: "qwen3:4b" },
   cloud: { endpoint: "", model: "" },
 };
 

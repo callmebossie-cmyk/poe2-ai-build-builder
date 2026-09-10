@@ -53,6 +53,38 @@ class FullBuildContractTests(unittest.TestCase):
         self.assertEqual(result["selected_direction_id"], "direction_2")
         self.assertTrue(all(result["validation"].values()))
         self.assertEqual(result["provider"]["output_status"], "test_only_not_ai_recommendation")
+        presentation = result["presentation"]
+        self.assertEqual(
+            {node["id"] for node in presentation["passive_tree"]["nodes"]},
+            set(result["build"]["passive_ids"]),
+        )
+        self.assertTrue(presentation["passive_tree"]["edges"])
+        inspection = presentation["inspection"]
+        self.assertGreater(len(inspection["nodes"]), 4000)
+        self.assertEqual(
+            {node["id"] for node in inspection["nodes"] if node["is_allocated"]},
+            set(result["build"]["passive_ids"]),
+        )
+        order = inspection["allocation_order"]
+        self.assertEqual(set(order), set(result["build"]["passive_ids"]))
+        self.assertEqual(len(order), len(set(order)))
+        edges = {frozenset((edge["from"], edge["to"])) for edge in inspection["edges"]}
+        for index, node_id in enumerate(order[1:], 1):
+            parent = inspection["parents"][node_id]
+            self.assertIn(parent, order[:index])
+            self.assertIn(frozenset((parent, node_id)), edges)
+        self.assertTrue(inspection["warnings"])
+        self.assertTrue(inspection["skill_effects"])
+        self.assertTrue(any(source["file_name"] == "passive_tree.json" for source in inspection["sources"]))
+        self.assertEqual(presentation["skills"][0]["id"], "SnipePlayer")
+        self.assertEqual(
+            len(presentation["skills"][0]["supports"]),
+            len(result["build"]["skill_links"][0]["support_ids"]),
+        )
+        self.assertEqual(
+            presentation["equipment"][0]["base_id"],
+            result["build"]["equipment"][0]["item_base_id"],
+        )
 
     def test_context_supplies_a_connected_allocation_from_ranger_start(self) -> None:
         allocated = set(self.context["suggested_connected_passive_ids"])

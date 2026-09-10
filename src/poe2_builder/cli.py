@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 from .fetch import fetch_sources
@@ -11,7 +12,8 @@ from .graph import PassiveGraph, PathNotFoundError
 from .importer import build_database
 from .retrieval import BuildIntent, CandidateRetriever
 from .ollama_provider import OllamaProvider
-from .full_builds import FullBuildService
+from .full_builds import FullBuildService, build_full_context, validate_full_build
+from .build_chat import BuildChatService, allowed_entity_ids
 from .validation import snipe_summary, validate_database
 
 
@@ -39,7 +41,7 @@ def parser() -> argparse.ArgumentParser:
     directions.add_argument("--budget", default="Cheap")
     directions.add_argument("--quality", choices=[mode.value for mode in QualityMode], default=QualityMode.BALANCED.value)
     ollama = commands.add_parser("directions-ollama", help="run live build directions through local Ollama")
-    ollama.add_argument("--model", default="qwen3:8b")
+    ollama.add_argument("--model", default="qwen3:4b")
     ollama.add_argument("--endpoint", default="http://127.0.0.1:11434/api/chat")
     ollama.add_argument("--skill", default="Snipe")
     ollama.add_argument("--playstyle", default="Fast")
@@ -48,11 +50,17 @@ def parser() -> argparse.ArgumentParser:
     ollama.add_argument("--quality", choices=[mode.value for mode in QualityMode], default=QualityMode.BALANCED.value)
     ollama.add_argument("--output", type=Path)
     full_build = commands.add_parser("full-build-ollama", help="expand a validated direction through local Ollama")
-    full_build.add_argument("--model", default="qwen3:8b")
+    full_build.add_argument("--model", default="qwen3:4b")
     full_build.add_argument("--endpoint", default="http://127.0.0.1:11434/api/chat")
     full_build.add_argument("--directions", type=Path, default=Path(".cache/live-directions.json"))
     full_build.add_argument("--direction-id", default="direction_2")
     full_build.add_argument("--output", type=Path, default=Path(".cache/live-full-build.json"))
+    full_build_stdin = commands.add_parser("full-build-ollama-stdin", help="expand one JSON direction read from stdin")
+    full_build_stdin.add_argument("--model", default="qwen3:4b")
+    full_build_stdin.add_argument("--endpoint", default="http://127.0.0.1:11434/api/chat")
+    chat = commands.add_parser("build-chat-ollama-stdin", help="answer a question about a validated build read from stdin")
+    chat.add_argument("--model", default="qwen3:4b")
+    chat.add_argument("--endpoint", default="http://127.0.0.1:11434/api/chat")
     commands.add_parser("all", help="fetch, build, validate, and show Snipe data")
     return result
 
@@ -135,12 +143,48 @@ def main() -> None:
         service = FullBuildService(
             args.database,
             OllamaProvider(model=args.model, endpoint=args.endpoint),
-            max_attempts=3,
+            max_attempts=5,
         )
         result = service.generate(matches[0])
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         print_json(result)
+    if args.command == "full-build-ollama-stdin":
+        payload = json.load(sys.stdin)
+        direction = payload.get("direction")
+        if not isinstance(direction, dict):
+            raise ValueError("stdin payload must contain one direction object")
+        service = FullBuildService(
+            args.database,
+            OllamaProvider(model=args.model, endpoint=args.endpoint),
+            max_attempts=5,
+        )
+        print_json(service.generate(direction))
+    if args.command == "build-chat-ollama-stdin":
+        payload = json.load(sys.stdin)
+        direction = payload.get("direction")
+        build = payload.get("build")
+        if not isinstance(direction, dict) or not isinstance(build, dict):
+            raise ValueError("stdin payload must contain direction and build objects")
+        context = build_full_context(args.database, direction)
+        validate_full_build({"schema_version": 1, "build": build}, context, args.database)
+        intent_value = payload.get("intent")
+        if not isinstance(intent_value, dict):
+            raise ValueError("stdin payload must contain one intent object")
+        intent = BuildIntent(
+            intent_value.get("skill"), intent_value.get("playstyle"),
+            intent_value.get("goal"), intent_value.get("budget"),
+        )
+        evidence = CandidateRetriever(args.database).retrieve(intent)
+        allowed = allowed_entity_ids(direction, build)
+        evidence["candidates"] = {
+            category: [candidate for candidate in candidates if candidate["id"] in allowed]
+            for category, candidates in evidence["candidates"].items()
+        }
+        service = BuildChatService(OllamaProvider(model=args.model, endpoint=args.endpoint))
+        print_json(service.answer(
+            direction, build, payload.get("question"), payload.get("history", []), evidence
+        ))
 
 
 if __name__ == "__main__":

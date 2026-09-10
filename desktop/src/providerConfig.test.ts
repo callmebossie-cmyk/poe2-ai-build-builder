@@ -17,7 +17,7 @@ describe("provider configuration", () => {
   it("supplies local defaults without storing a credential", () => {
     const config = configForProvider("ollama");
     expect(config.endpoint).toBe("http://127.0.0.1:11434");
-    expect(config.model).toBe("qwen3:8b");
+    expect(config.model).toBe("qwen3:4b");
     expect(config.credentialConfigured).toBe(false);
   });
 

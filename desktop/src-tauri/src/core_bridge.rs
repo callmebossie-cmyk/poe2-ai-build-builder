@@ -1,7 +1,9 @@
 use serde::Serialize;
 use serde_json::Value;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::process::Stdio;
 
 #[cfg(windows)]
 use std::os::windows::process::CommandExt;
@@ -68,10 +70,55 @@ pub(crate) fn run_core_command(args: &[&str]) -> Result<Vec<u8>, String> {
         let stderr = String::from_utf8_lossy(&output.stderr);
         return Err(format!(
             "Deterministic core command failed: {}",
-            stderr.trim()
+            core_error_summary(&stderr)
         ));
     }
     Ok(output.stdout)
+}
+
+pub(crate) fn run_core_command_with_input(args: &[&str], input: &[u8]) -> Result<Vec<u8>, String> {
+    let root = resolve_project_root()?;
+    let python = std::env::var("POE2_BUILDER_PYTHON").unwrap_or_else(|_| "python".into());
+    let mut command = Command::new(python);
+    command
+        .args(["-m", "poe2_builder.cli"])
+        .args(args)
+        .current_dir(&root)
+        .env("PYTHONPATH", root.join("src"))
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    #[cfg(windows)]
+    command.creation_flags(CREATE_NO_WINDOW);
+    let mut child = command
+        .spawn()
+        .map_err(|error| format!("Could not start the deterministic core: {error}"))?;
+    child
+        .stdin
+        .take()
+        .ok_or_else(|| "Could not open deterministic core input".to_string())?
+        .write_all(input)
+        .map_err(|error| format!("Could not write deterministic core input: {error}"))?;
+    let output = child
+        .wait_with_output()
+        .map_err(|error| format!("Could not read deterministic core output: {error}"))?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!(
+            "Deterministic core command failed: {}",
+            core_error_summary(&stderr)
+        ));
+    }
+    Ok(output.stdout)
+}
+
+fn core_error_summary(stderr: &str) -> &str {
+    stderr
+        .lines()
+        .rev()
+        .find(|line| !line.trim().is_empty())
+        .map(str::trim)
+        .unwrap_or("Unknown core error")
 }
 
 fn actual_for(rows: &[Value], check: &str) -> Result<i64, String> {
@@ -129,5 +176,14 @@ mod tests {
             parse_validation_output(br#"[{"check":"Snipe exists","actual":1,"passed":false}]"#)
                 .expect_err("failed validation must not be summarized as healthy");
         assert!(error.contains("0/1 checks passed"));
+    }
+
+    #[test]
+    fn reports_only_the_actionable_python_error() {
+        let stderr = "Traceback (most recent call last):\n  noisy frame\nFullBuildValidationError: narrative contains a numeric claim\n";
+        assert_eq!(
+            core_error_summary(stderr),
+            "FullBuildValidationError: narrative contains a numeric claim"
+        );
     }
 }

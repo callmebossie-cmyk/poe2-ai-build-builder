@@ -9,6 +9,7 @@ from typing import Protocol
 
 from .database import connect
 from .graph import PassiveGraph
+from .build_inspection import inspection_data
 
 
 class FullBuildValidationError(ValueError):
@@ -172,6 +173,7 @@ class FullBuildService:
                 "Expand only the selected direction and use only its referenced entity IDs.",
                 "Use suggested_connected_passive_ids as the complete passive allocation.",
                 "Do not invent effects, requirements, prices, or exact DPS.",
+                "Do not write digits, numeric ratings, percentages, DPS, prices, or currency amounts in passive_direction, affix_priorities, defense, resource_solution, leveling_concept, upgrade_order, or rotation.",
             ],
         }
         last_error: Exception | None = None
@@ -201,6 +203,7 @@ class FullBuildService:
             },
             "selected_direction_id": direction["direction_id"],
             "build": build,
+            "presentation": build_presentation(self.database_path, direction, build),
             "validation": {
                 "schema_valid": True,
                 "entity_references_valid": True,
@@ -231,6 +234,147 @@ class FullBuildService:
         if runtime_metadata:
             result["provider"]["runtime"] = runtime_metadata
         return result
+
+
+def _display_text(value: str | None) -> str:
+    if not value:
+        return ""
+    return re.sub(r"\[([^\]]+)\]", lambda match: match.group(1).split("|")[-1], value)
+
+
+def build_presentation(
+    database_path: Path, direction: dict[str, object], build: dict[str, object]
+) -> dict[str, object]:
+    """Resolve validated build IDs into bounded display data from SQLite."""
+    allocated = list(build["passive_ids"])
+    allocated_set = set(allocated)
+    placeholders = ",".join("?" for _ in allocated)
+    db = connect(database_path)
+    try:
+        start_row = db.execute(
+            "SELECT node_id FROM class_starts WHERE class_name=?", (build["class_name"],)
+        ).fetchone()
+        start_id = start_row["node_id"]
+        passive_rows = db.execute(
+            f"SELECT id,name,is_keystone,is_notable,payload_json FROM passive_nodes WHERE id IN ({placeholders})",
+            allocated,
+        ).fetchall()
+        stat_rows = db.execute(
+            f"SELECT node_id,text FROM passive_stats WHERE node_id IN ({placeholders}) ORDER BY node_id,ordinal",
+            allocated,
+        ).fetchall()
+        stats: dict[str, list[str]] = {node_id: [] for node_id in allocated}
+        for row in stat_rows:
+            stats[row["node_id"]].append(_display_text(row["text"]))
+        edge_rows = db.execute(
+            f"SELECT from_node,to_node FROM passive_edges WHERE from_node IN ({placeholders}) AND to_node IN ({placeholders})",
+            [*allocated, *allocated],
+        ).fetchall()
+        adjacency: dict[str, set[str]] = {node_id: set() for node_id in allocated}
+        edges = []
+        seen_edges: set[tuple[str, str]] = set()
+        for row in edge_rows:
+            left, right = row["from_node"], row["to_node"]
+            adjacency[left].add(right)
+            adjacency[right].add(left)
+            edge = tuple(sorted((left, right)))
+            if edge not in seen_edges:
+                seen_edges.add(edge)
+                edges.append({"from": left, "to": right})
+        depths = {start_id: 0}
+        queue = deque([start_id])
+        while queue:
+            node_id = queue.popleft()
+            for neighbor in sorted(adjacency[node_id]):
+                if neighbor not in depths:
+                    depths[neighbor] = depths[node_id] + 1
+                    queue.append(neighbor)
+        target_ids = set(direction.get("passive_ids", []))
+        nodes = []
+        for row in passive_rows:
+            payload = json.loads(row["payload_json"])
+            nodes.append({
+                "id": row["id"],
+                "name": row["name"] or "Travel node",
+                "x": payload.get("x", 0),
+                "y": payload.get("y", 0),
+                "stats": stats[row["id"]],
+                "depth": depths.get(row["id"], 0),
+                "is_start": row["id"] == start_id,
+                "is_target": row["id"] in target_ids,
+                "is_notable": bool(row["is_notable"]),
+                "is_keystone": bool(row["is_keystone"]),
+            })
+        nodes.sort(key=lambda node: (node["depth"], not node["is_target"], node["name"], node["id"]))
+
+        skill = db.execute(
+            "SELECT id,name,description FROM skills WHERE id=?", (build["main_skill_id"],)
+        ).fetchone()
+        skill_tags = [row["tag"] for row in db.execute(
+            "SELECT tag FROM skill_tags WHERE skill_id=? ORDER BY tag", (build["main_skill_id"],)
+        )]
+        support_ids = build["skill_links"][0]["support_ids"]
+        supports = []
+        for support_id in support_ids:
+            row = db.execute(
+                "SELECT id,name,payload_json FROM support_gems WHERE id=?", (support_id,)
+            ).fetchone()
+            payload = json.loads(row["payload_json"])
+            gem = payload.get("gem", {})
+            relationship = db.execute(
+                "SELECT relationship FROM support_compatibility WHERE skill_id=? AND support_id=?",
+                (build["main_skill_id"], support_id),
+            ).fetchone()
+            supports.append({
+                "id": row["id"], "name": row["name"],
+                "description": _display_text(gem.get("support_text")),
+                "tags": gem.get("tags", []),
+                "crafting_level": gem.get("crafting_level"),
+                "relationship": relationship["relationship"] if relationship else "validated_compatible",
+            })
+
+        equipment = []
+        for item in build["equipment"]:
+            base = db.execute(
+                "SELECT id,name,item_class,drop_level,payload_json FROM item_bases WHERE id=?",
+                (item["item_base_id"],),
+            ).fetchone()
+            payload = json.loads(base["payload_json"])
+            properties = payload.get("properties", {})
+            mods = []
+            for mod_id in item["mod_ids"]:
+                mod = db.execute(
+                    "SELECT id,name,generation_type,required_level,text FROM mods WHERE id=?", (mod_id,)
+                ).fetchone()
+                mods.append({
+                    "id": mod["id"], "name": mod["name"],
+                    "generation_type": mod["generation_type"],
+                    "required_level": mod["required_level"] or 1,
+                    "text": _display_text(mod["text"]),
+                })
+            equipment.append({
+                "slot": item["slot"], "base_id": base["id"], "name": base["name"],
+                "item_class": base["item_class"], "drop_level": base["drop_level"],
+                "requirements": payload.get("requirements", {}),
+                "properties": {key: properties.get(key) for key in (
+                    "physical_damage_min", "physical_damage_max", "attack_time",
+                    "critical_strike_chance", "range", "armour", "evasion", "energy_shield"
+                ) if properties.get(key) is not None},
+                "mods": mods,
+            })
+        inspection = inspection_data(db, build, direction)
+    finally:
+        db.close()
+    return {
+        "inspection": inspection,
+        "passive_tree": {"start_id": start_id, "nodes": nodes, "edges": edges},
+        "skills": [{
+            "id": skill["id"], "name": skill["name"],
+            "description": _display_text(skill["description"]), "tags": skill_tags,
+            "supports": supports,
+        }],
+        "equipment": equipment,
+    }
 
 
 def _non_empty_text(value: object, location: str) -> str:

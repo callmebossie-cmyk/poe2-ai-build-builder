@@ -86,4 +86,17 @@
 - [x] Checkpoint 6C — add the first deterministic Snipe build-intent and candidate-retrieval screen.
 - [x] Validate the intent allowlist at the native bridge boundary.
 - [x] Return only bounded candidate previews and aggregate metadata to the desktop.
-- [ ] Checkpoint 6D — add provider-gated Build Direction generation and cards, beginning with configured local Ollama.
+- [x] Checkpoint 6D — add provider-gated Build Direction generation and validated cards using local Ollama.
+- [x] Checkpoint 6E — generate a Full Build from the selected direction and require deterministic validation before display.
+- [x] Checkpoint 6F — add bounded follow-up chat grounded in the validated build and retrieved evidence.
+
+## Full Build workspace follow-up
+
+- [x] Display full GGG tree context with pinned artwork, search, pan/zoom, inspection and connected allocation-order preview.
+- [x] Expand equipment, skill/support details, source revisions and advisory notes.
+- [x] Label missing gear and unavailable calculations explicitly.
+- [ ] Verify UI interactions and responsive layouts manually.
+- [ ] Generate every equipment slot and utility skill with requirement-aware validation.
+- [ ] Validate special-source modifier acquisition and compatibility beyond spawn-tag overlap.
+- [ ] Reconcile gem levels, attributes, passive budgets, quest rewards and ascendancy points.
+- [ ] Add calculated DPS, defenses, resistances and resource sustain.

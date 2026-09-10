@@ -6,6 +6,8 @@ __pycache__/
 .pytest_cache/
 /desktop/node_modules/
 /desktop/dist/
+/desktop/public/tree/skills.json
+/desktop/public/tree/skills.webp
 /desktop/*.tsbuildinfo
 /desktop/src-tauri/gen/
 /desktop/src-tauri/icons/android/

@@ -4,7 +4,9 @@ Desktop build-planning tool for Path of Exile 2. The application will combine re
 
 ## Current status
 
-Checkpoints 1 through 5 are complete: real-data import, passive graph, candidate retrieval, live AI build directions, a live Full Build, and deterministic bounded validation. The Core MVP labels uncalculated qualitative/resource claims as advisory. Checkpoint 6 will add a provider-neutral desktop application with first-run provider selection. Downloaded data, generated databases, and live AI evidence are ignored by Git.
+Checkpoints 1 through 6F are complete: real-data import, passive graph, candidate retrieval, live AI build directions, validated Full Builds, and grounded follow-up chat are available through the provider-neutral desktop application. The Core MVP labels uncalculated qualitative/resource claims as advisory. Downloaded data, generated databases, models, and live AI evidence are ignored by Git.
+
+The expanded workspace shows the full GGG passive tree with local artwork, searchable nodes and allocation order, equipment slots, gem details and explicit coverage limits. Generated builds remain partial: full gear, utility skills and PoB-style combat calculations are not implemented. Desktop dev/build fetches the pinned passive icon atlas locally; downloaded artwork is not committed.
 
 ## Data proof of concept
 
@@ -19,8 +21,8 @@ python -m poe2_builder.cli snipe
 python -m poe2_builder.cli graph-demo --class-name Ranger
 python -m poe2_builder.cli retrieve --skill Snipe --playstyle Fast --goal Mapping --budget Cheap
 python -m poe2_builder.cli directions-contract-demo
-python -m poe2_builder.cli directions-ollama --model qwen3:8b --output .cache/live-directions.json
-python -m poe2_builder.cli full-build-ollama --model qwen3:8b --direction-id direction_2 --output .cache/live-full-build.json
+python -m poe2_builder.cli directions-ollama --model qwen3:4b --output .cache/live-directions.json
+python -m poe2_builder.cli full-build-ollama --model qwen3:4b --direction-id direction_2 --output .cache/live-full-build.json
 ```
 
 Run the unit tests with:

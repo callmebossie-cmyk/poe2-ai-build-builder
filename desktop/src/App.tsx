@@ -6,6 +6,9 @@ import {
   RetrievalSummary,
   retrieveCandidates,
 } from "./candidateRetrieval";
+import { BuildDirection, DirectionResult, generateDirections } from "./buildDirections";
+import { ChatMessage, FullBuildResult, askAboutBuild, generateFullBuild } from "./buildWorkflow";
+import BuildDetails from "./BuildDetails";
 import {
   DEFAULT_PROVIDER_CONFIG,
   PROVIDER_CONFIG_KEY,
@@ -43,6 +46,17 @@ export default function App() {
   const [retrieval, setRetrieval] = useState<RetrievalSummary | null>(null);
   const [retrievalError, setRetrievalError] = useState("");
   const [retrieving, setRetrieving] = useState(false);
+  const [directions, setDirections] = useState<DirectionResult | null>(null);
+  const [directionError, setDirectionError] = useState("");
+  const [generatingDirections, setGeneratingDirections] = useState(false);
+  const [selectedDirection, setSelectedDirection] = useState<BuildDirection | null>(null);
+  const [fullBuild, setFullBuild] = useState<FullBuildResult | null>(null);
+  const [building, setBuilding] = useState(false);
+  const [buildError, setBuildError] = useState("");
+  const [chat, setChat] = useState<ChatMessage[]>([]);
+  const [question, setQuestion] = useState("");
+  const [chatting, setChatting] = useState(false);
+  const [chatError, setChatError] = useState("");
   const errors = useMemo(() => validateProviderConfig(config), [config]);
 
   useEffect(() => {
@@ -77,11 +91,59 @@ export default function App() {
     setRetrievalError("");
     try {
       setRetrieval(await retrieveCandidates(intent));
+      setDirections(null);
+      setSelectedDirection(null);
+      setFullBuild(null);
+      setChat([]);
     } catch (error) {
       setRetrievalError(error instanceof Error ? error.message : String(error));
     } finally {
       setRetrieving(false);
     }
+  };
+
+  const createDirections = async () => {
+    if (config.provider !== "ollama") return;
+    setGeneratingDirections(true);
+    setDirectionError("");
+    try {
+      const result = await generateDirections({
+        ...intent,
+        endpoint: config.endpoint,
+        model: config.model,
+        qualityMode: config.qualityMode,
+      });
+      setDirections(result);
+      setSelectedDirection(null);
+      setFullBuild(null);
+      setChat([]);
+    } catch (error) {
+      setDirectionError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setGeneratingDirections(false);
+    }
+  };
+
+  const createFullBuild = async () => {
+    if (!selectedDirection) return;
+    setBuilding(true); setBuildError("");
+    try {
+      setFullBuild(await generateFullBuild(config.endpoint, config.model, selectedDirection));
+      setChat([]);
+    } catch (error) { setBuildError(error instanceof Error ? error.message : String(error)); }
+    finally { setBuilding(false); }
+  };
+
+  const ask = async () => {
+    if (!selectedDirection || !fullBuild || !question.trim()) return;
+    const userMessage: ChatMessage = { role: "user", content: question.trim() };
+    const prior = chat.slice(-12);
+    setChat([...chat, userMessage]); setQuestion(""); setChatting(true); setChatError("");
+    try {
+      const result = await askAboutBuild(config.endpoint, config.model, selectedDirection, fullBuild.build, intent, userMessage.content, prior);
+      setChat((current) => [...current, { role: "assistant", content: `${result.answer}${result.advisory ? "\n\nAdvisory: this includes qualitative guidance." : ""}` }]);
+    } catch (error) { setChatError(error instanceof Error ? error.message : String(error)); }
+    finally { setChatting(false); }
   };
 
   if (config.onboardingComplete) {
@@ -115,6 +177,32 @@ export default function App() {
           {retrievalError && <p className="inline-error">{retrievalError}</p>}
           {retrieval && <div className="retrieval-summary"><div className="retrieval-meta"><strong>{retrieval.totalCandidates} bounded candidates</strong><span>{(retrieval.serializedBytes / 1024).toFixed(1)} KB · {retrieval.playstyle} · {retrieval.goal} · {retrieval.budget}</span></div><div className="candidate-groups">{retrieval.groups.map((group) => <article key={group.category}><header><strong>{group.category.replace("_", " ")}</strong><span>{group.count}</span></header>{group.top.map((candidate) => <div className="candidate" key={candidate.id}><b>{candidate.name}</b><span>Score {candidate.score}</span><p>{candidate.reasons[0]}</p></div>)}</article>)}</div></div>}
         </section>
+        {retrieval && <section className="direction-panel">
+          <div className="section-heading"><div><small>AI THEORYCRAFTING</small><h2>Build directions</h2></div><p>{config.provider === "ollama" ? `Validated locally with ${config.model}.` : "Connect local Ollama to generate build directions."}</p></div>
+          {config.provider === "ollama" ? <button className="continue direction-action" disabled={generatingDirections} onClick={createDirections}>{generatingDirections ? "Thinking & validating…" : directions ? "Regenerate directions" : "Generate directions"}</button> : <button className="secondary direction-action" onClick={() => setConfig({ ...config, onboardingComplete: false })}>Connect Ollama</button>}
+          {directionError && <p className="inline-error">{directionError}</p>}
+          {directions && <><div className="retrieval-meta direction-meta"><strong>{directions.directions.length} validated directions</strong><span>{directions.providerName} · attempt {directions.attempts} · {(directions.requestBytes / 1024).toFixed(1)} KB context</span></div>
+            <div className="direction-grid">{directions.directions.map((direction) => <article className={selectedDirection?.directionId === direction.directionId ? "selected" : ""} key={direction.directionId}>
+              <small>{direction.className} · {direction.ascendancyId}</small><h3>{direction.title}</h3><p>{direction.concept}</p>
+              <div className="ratings"><span>Mapping <b>{direction.mappingViability.rating}/5</b></span><span>Bossing <b>{direction.bossViability.rating}/5</b></span></div>
+              <dl><dt>Damage</dt><dd>{direction.damageDirection}</dd><dt>Defense</dt><dd>{direction.defenseDirection}</dd></dl>
+              <button className="secondary" onClick={() => { setSelectedDirection(direction); setFullBuild(null); setChat([]); }}>{selectedDirection?.directionId === direction.directionId ? "Selected ✓" : "Choose direction"}</button>
+            </article>)}</div>
+          </>}
+        </section>}
+        {selectedDirection && <section className="build-panel">
+          <div className="section-heading"><div><small>BUILD PLANNER</small><h2>Full Build workspace</h2></div><p>Inspect source data, planned choices and missing pieces.</p></div>
+          <button className="continue direction-action" disabled={building} onClick={createFullBuild}>{building ? "Building & validating…" : fullBuild ? "Regenerate Full Build" : "Create Full Build"}</button>
+          {buildError && <p className="inline-error">{buildError}</p>}
+          {fullBuild && <div className="build-result"><header><div><small>PROPOSED LEVEL {fullBuild.build.level} · {fullBuild.build.class_name} · {fullBuild.presentation.inspection.ascendancy_name}</small><h3>{fullBuild.build.title}</h3></div><span>{Object.values(fullBuild.validation).filter(Boolean).length} bounded checks · partial plan</span></header>
+            <BuildDetails key={fullBuild.build.build_id + fullBuild.build.title} result={fullBuild} />
+            <section className="chat-panel"><div className="section-heading"><div><small>BUILD CHAT</small><h2>Ask about this build</h2></div><p>Conversation stays grounded in this validated build.</p></div>
+              <div className="messages">{chat.length === 0 && <p className="empty-chat">Try “Why did you choose these supports?” or “What should I upgrade first?”</p>}{chat.map((message, index) => <div className={`message ${message.role}`} key={`${message.role}-${index}`}><b>{message.role === "user" ? "You" : "Build AI"}</b><p>{message.content}</p></div>)}</div>
+              <div className="chat-compose"><textarea value={question} maxLength={2000} placeholder="Ask a question about this build…" onChange={(event) => setQuestion(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void ask(); } }} /><button className="continue" disabled={chatting || !question.trim()} onClick={ask}>{chatting ? "Answering…" : "Ask"}</button></div>
+              {chatError && <p className="inline-error">{chatError}</p>}
+            </section>
+          </div>}
+        </section>}
         <footer className="actions">
           <div><strong>Provider-neutral by design</strong><span>No provider can replace the local source of truth.</span></div>
           <button className="secondary" onClick={() => { setConfig({ ...config, onboardingComplete: false }); setSaved(false); }}>Change provider</button>

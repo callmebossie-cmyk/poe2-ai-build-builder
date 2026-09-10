@@ -1,14 +1,14 @@
 # Development Status
 
-Last updated: 2026-09-09 (Asia/Bangkok)
+Last updated: 2026-09-10 (Asia/Bangkok)
 
 ## Current phase
 
-Checkpoints 1 through 5 and Checkpoints 6A through 6C are complete. The desktop can validate the core and retrieve bounded real candidates without an AI provider.
+Checkpoints 1 through 5 and Checkpoints 6A through 6F are complete. The desktop supports the complete local Ollama workflow from bounded retrieval through validated Full Build and follow-up chat.
 
 ## Current checkpoint
 
-Checkpoint 6C — deterministic Snipe intent and candidate-retrieval UI (complete); Checkpoint 6D — provider-gated Build Directions (next)
+Checkpoint 6F — grounded follow-up Build Chat (complete); Checkpoint 7 — Windows distribution (next)
 
 ## Completed work
 
@@ -49,12 +49,19 @@ Checkpoint 6C — deterministic Snipe intent and candidate-retrieval UI (complet
 - Rendered real Snipe, bow-base, passive-node, provenance, and validation counts on the no-AI dashboard.
 - Added a Snipe-only intent form and a fixed retrieval command with native allowlists for playstyle, goal, and budget.
 - Added typed, bounded candidate summaries across seven categories and rendered ranked previews without invoking AI.
+- Added local-only Ollama Build Direction, selected-direction Full Build, and Build Chat bridges.
+- Full Builds appear only after every deterministic validation group passes; chat revalidates the build on each request.
+- Added filtered retrieval evidence, bounded conversation history, entity-reference checks, quantitative-claim rejection, and retry feedback for chat.
+- Expanded Full Build results with SQLite-resolved passive nodes, real tree coordinates and allocated edges, source stat text, gem/support details, item properties, requirements, and mod descriptions.
+- Added Overview, Passive Tree, Skills, and Equipment tabs. The passive view draws only the validated allocation over real coordinates and lists progression distance from the class start.
+- Tuned inference contexts by task and selected `qwen3:4b` as the desktop default for the local RTX 4060.
+- Downloaded the model to `D:\OllamaModels` and completed live direction, Full Build, and grounded chat runs.
 
 ## Tests
 
-- Passing: forty-two unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
+- Passing: forty-six unit/integration tests on Python 3.10 with `ResourceWarning` promoted to an error; the pre-Ollama suite also passed on Python 3.14.
 - Passing: five provider-configuration tests, strict TypeScript/Vite production build, Rust `cargo check`, and Tauri release compilation without bundling.
-- Passing: four Rust bridge tests covering real Python/SQLite validation, failed-validation rejection, bounded real retrieval, and out-of-contract intent rejection.
+- Passing: seven Rust bridge tests covering real Python/SQLite validation, failed-validation rejection, bounded retrieval, out-of-contract intent rejection, and local-provider boundaries.
 - Passing: all 15 data validation queries, SQLite integrity check, and foreign-key check.
 - Passing: class mapping, real projectile route, point cost, virtual-root exclusion, wrong-ascendancy rejection, enabled-ascendancy route, and missing-node rejection.
 - Passing: retrieval bounds, provenance/reasons, expected Snipe mechanics/supports, unique-data honesty, deterministic output, word-boundary matching, and unknown-skill rejection.
@@ -97,4 +104,4 @@ None for the next bounded implementation phase.
 
 ## Next task
 
-Add provider-gated Build Direction generation and cards, beginning with configured local Ollama without adding Full Build generation.
+Finish full equipment/utility-skill generation, reconcile passive budgets and attributes, and implement combat calculations before calling generated plans complete. Manually verify workspace interactions; browser/Windows automation was unavailable. Windows distribution remains pending.

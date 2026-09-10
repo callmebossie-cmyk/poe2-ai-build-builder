@@ -175,9 +175,26 @@ def full_build_json_schema(context: dict[str, object]) -> dict[str, object]:
     }
 
 
+def build_chat_json_schema() -> dict[str, object]:
+    return {
+        "type": "object",
+        "properties": {
+            "schema_version": {"type": "integer", "enum": [1]},
+            "answer": {"type": "string", "minLength": 1},
+            "grounded_entity_ids": {
+                "type": "array",
+                "items": {"type": "string"},
+            },
+            "advisory": {"type": "boolean"},
+        },
+        "required": ["schema_version", "answer", "grounded_entity_ids", "advisory"],
+        "additionalProperties": False,
+    }
+
+
 @dataclass
 class OllamaProvider:
-    model: str = "qwen3:8b"
+    model: str = "qwen3:4b"
     endpoint: str = "http://127.0.0.1:11434/api/chat"
     timeout_seconds: int = 900
     name: str = field(init=False)
@@ -188,14 +205,25 @@ class OllamaProvider:
         self.name = f"ollama:{self.model}"
 
     def generate(self, request: dict[str, object]) -> str:
-        context = request["build_context"]
-        if request.get("task") == "generate_full_build":
+        task = request.get("task")
+        if task == "answer_build_question":
+            schema = build_chat_json_schema()
+            task_instruction = (
+                "Answer the latest conversation question about the supplied validated build. "
+                "Ground entity references in allowed_entity_ids and be explicit about evidence limits. "
+                "Describe mechanics only when they are stated literally in build_evidence; an entity ID alone is not evidence of an effect. "
+                "Do not write digits, numeric ratings, percentages, DPS, prices, or currency amounts in the answer."
+            )
+        elif task == "generate_full_build":
+            context = request["build_context"]
             schema = full_build_json_schema(context)
             task_instruction = (
                 "Expand the one selected direction into one full build. Copy the complete supplied "
-                "passive allocation and choose only entity IDs present in that direction."
+                "passive allocation and choose only entity IDs present in that direction. "
+                "Never write digits or numeric claims in narrative or priority fields."
             )
         else:
+            context = request["build_context"]
             schema = direction_json_schema(context)
             task_instruction = "Make the three build directions materially distinct."
         system = (
@@ -205,6 +233,12 @@ class OllamaProvider:
             f"absent from the context. {task_instruction}"
         )
         prompt = json.dumps(request, ensure_ascii=False, separators=(",", ":"))
+        if task == "generate_build_directions":
+            context_size, prediction_limit = 12_288, 3_500
+        elif task == "generate_full_build":
+            context_size, prediction_limit = 8_192, 2_500
+        else:
+            context_size, prediction_limit = 8_192, 2_000
         body = {
             "model": self.model,
             "messages": [
@@ -217,8 +251,8 @@ class OllamaProvider:
             "options": {
                 "temperature": 0.15,
                 "seed": 42,
-                "num_ctx": 32768,
-                "num_predict": 6000,
+                "num_ctx": context_size,
+                "num_predict": prediction_limit,
             },
             "keep_alive": "10m",
         }
@@ -232,6 +266,9 @@ class OllamaProvider:
         try:
             with urllib.request.urlopen(http_request, timeout=self.timeout_seconds) as response:
                 result = json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as error:
+            detail = error.read().decode("utf-8", errors="replace")
+            raise OllamaProviderError(f"Ollama request failed with HTTP {error.code}: {detail}") from error
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as error:
             raise OllamaProviderError(f"Ollama request failed: {error}") from error
         try:

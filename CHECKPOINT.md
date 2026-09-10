@@ -1,15 +1,15 @@
 # Project Checkpoint
 
-Last updated: 2026-09-09 (Asia/Bangkok)
+Last updated: 2026-09-10 (Asia/Bangkok)
 
 ## Current state
 
 - Checkpoints 1 through 5 are complete; the deterministic/AI Core MVP exists.
 - A dependency-free Python data core downloads seven pinned real-data exports, verifies SHA-256 checksums, and builds `data/poe2.db` locally.
 - The generated database contains Snipe, its real tags/levels/stat sets, 15 source-recommended supports, the complete passive tree, ascendancies, item bases, mods, and per-file provenance.
-- Downloaded JSON and the generated database are excluded from Git.
+- Downloaded game-data JSON, artwork and the generated database are excluded from Git. The pinned GGG passive icon atlas is fetched locally before desktop dev/build.
 - No user action is currently required.
-- Changes after commit `d62d287` are local only and have not been pushed, following the user's instruction.
+- The user authorized committing and pushing the current desktop/chat/planner work on 2026-09-10.
 
 ## Completed acceptance evidence
 
@@ -54,15 +54,23 @@ Last updated: 2026-09-09 (Asia/Bangkok)
 - Checkpoint 6C adds a Snipe build-intent form and a fixed candidate-retrieval bridge with native allowlist validation.
 - The no-AI desktop renders a bounded summary across seven candidate categories, with at most three previews per category.
 - Four Rust bridge tests, five provider-state tests, the production frontend build, and all forty-two Python tests pass.
+- Checkpoint 6D renders three live-AI Build Direction cards only after Python schema and entity-reference validation.
+- Checkpoint 6E expands a selected direction into a Full Build and exposes it only when every deterministic validation flag passes.
+- Checkpoint 6F adds bounded multi-turn build chat, revalidates the supplied build before every answer, filters retrieved evidence to selected entities, rejects unknown entity IDs, and rejects unsupported numeric claims.
+- Validated Full Build results now include deterministic presentation data: allocated passive coordinates/edges/stats and progression distance, active/support gem descriptions and tags, plus selected item base properties and mod text.
+- The desktop exposes Overview, Passive Tree, Skills, and Equipment tabs; unspecified equipment slots remain explicitly empty.
+- `qwen3:4b` is installed in `D:\OllamaModels`; its 12K direction context fits the local RTX 4060 materially better than `qwen3:8b`.
+- Live `qwen3:4b` evidence passed direction generation, Full Build validation, and grounded chat on 2026-09-10.
+- Forty-six Python tests, seven Rust tests, five frontend tests, and the production frontend build pass.
 
 ## Current phase
 
-Checkpoint 6C — deterministic Snipe intent and candidate-retrieval UI is complete. Checkpoint 6D — provider-gated Build Directions is next.
+Checkpoint 6F — grounded follow-up build chat is complete. Checkpoint 7 — Windows distribution is next.
 
 ## Next exact action
 
-Add provider-gated Build Direction generation and direction cards, beginning with configured local Ollama while keeping provider mode `none` fully deterministic.
+Package the local core and generated-data setup into the Windows distribution boundary without redistributing restricted source datasets.
 
 ## Completion rule for the next phase
 
-Do not invoke AI unless a compatible provider is configured. Keep the provider boundary typed and do not add Full Build generation in the same phase.
+The packaged application must preserve the typed provider boundary and document or automate local data and model prerequisites.
