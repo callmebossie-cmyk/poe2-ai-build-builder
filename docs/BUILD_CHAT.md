@@ -15,3 +15,5 @@ Equipment is a selectable slot diagram with base properties, requirements and mo
 This remains a partial build generator, not a PoB calculator. Full gear generation, utility skills, ascendancy allocation, gem level/quality choices, passive budget/quest reconciliation and calculated character totals remain unfinished. Special-source modifiers are highlighted for review.
 
 Workspace verification: Python 46 tests, frontend 5 tests and production TypeScript/Vite build pass. Browser and Windows automation could not initialize (kernel asset path failure), so interactive and responsive visual checks require manual verification.
+
+The native bridge explicitly sets Python stdin/stdout/stderr to UTF-8. Windows code-page output previously caused full-tree JSON to fail parsing. A subprocess round-trip regression covers Thai, punctuation and emoji; a cached full build with 5,152 display nodes also passes UTF-8 pipe decoding. Rust bridge tests: 9 passed.

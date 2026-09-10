@@ -11,6 +11,11 @@ use std::os::windows::process::CommandExt;
 #[cfg(windows)]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
+fn configure_python_encoding(command: &mut Command) {
+    // Pipes use the Windows code page unless the child explicitly selects UTF-8.
+    command.env("PYTHONIOENCODING", "utf-8");
+}
+
 #[derive(Debug, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CoreStatus {
@@ -56,6 +61,7 @@ pub(crate) fn run_core_command(args: &[&str]) -> Result<Vec<u8>, String> {
     let root = resolve_project_root()?;
     let python = std::env::var("POE2_BUILDER_PYTHON").unwrap_or_else(|_| "python".into());
     let mut command = Command::new(python);
+    configure_python_encoding(&mut command);
     command
         .args(["-m", "poe2_builder.cli"])
         .args(args)
@@ -80,6 +86,7 @@ pub(crate) fn run_core_command_with_input(args: &[&str], input: &[u8]) -> Result
     let root = resolve_project_root()?;
     let python = std::env::var("POE2_BUILDER_PYTHON").unwrap_or_else(|_| "python".into());
     let mut command = Command::new(python);
+    configure_python_encoding(&mut command);
     command
         .args(["-m", "poe2_builder.cli"])
         .args(args)
@@ -159,6 +166,34 @@ pub fn read_core_status() -> Result<CoreStatus, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn python_json_round_trips_unicode_over_pipes() {
+        let python = std::env::var("POE2_BUILDER_PYTHON").unwrap_or_else(|_| "python".into());
+        let mut command = Command::new(python);
+        command.env("PYTHONIOENCODING", "cp1252");
+        configure_python_encoding(&mut command);
+        command.args(["-c", "import json,sys; value=json.load(sys.stdin); print(json.dumps(value,ensure_ascii=False)); print(value['text'],file=sys.stderr)"])
+            .stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::piped());
+        let expected = serde_json::json!({"text": "ภาษาไทย — café · 🏹"});
+        let mut child = command.spawn().unwrap();
+        child
+            .stdin
+            .take()
+            .unwrap()
+            .write_all(&serde_json::to_vec(&expected).unwrap())
+            .unwrap();
+        let output = child.wait_with_output().unwrap();
+        assert!(output.status.success(), "{:?}", output.stderr);
+        assert_eq!(
+            serde_json::from_slice::<Value>(&output.stdout).unwrap(),
+            expected
+        );
+        assert_eq!(
+            std::str::from_utf8(&output.stderr).unwrap().trim(),
+            expected["text"].as_str().unwrap()
+        );
+    }
 
     #[test]
     fn reads_the_real_python_core_without_mutation() {
